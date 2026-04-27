@@ -3,54 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AxisProject inc. | Official Site</title>
+    <title>AxisTube | Official Platform</title>
     <style>
-        body {
-            background-color: #0d1117;
-            color: #c9d1d9;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .container {
-            text-align: center;
-            border: 1px solid #30363d;
-            padding: 50px;
-            border-radius: 10px;
-            background: #161b22;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        h1 {
-            color: #58a6ff;
-            font-size: 3rem;
-            margin-bottom: 10px;
-            letter-spacing: 2px;
-        }
-        p {
-            font-size: 1.2rem;
-            color: #8b949e;
-        }
-        .status {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 5px 15px;
-            border-radius: 20px;
-            background: #238636;
-            color: white;
-            font-size: 0.9rem;
-        }
+        :root { --main-blue: #58a6ff; --bg: #0f0f0f; --card: #1e1e1e; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding-bottom: 50px; }
+        
+        /* Шапка сайта */
+        nav { background: #202020; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; position: sticky; top: 0; z-index: 100; }
+        .logo { font-size: 1.6rem; font-weight: bold; color: var(--main-blue); text-decoration: none; letter-spacing: 1px; }
+        
+        /* Кнопки */
+        .btn { background: var(--main-blue); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn:hover { opacity: 0.8; transform: scale(1.05); }
+        .btn-logout { background: transparent; border: 1px solid #444; margin-left: 10px; font-size: 0.8rem; }
+
+        /* Секция загрузки (видна только после входа) */
+        #uploadSection { display: none; background: var(--card); margin: 30px auto; width: 90%; max-width: 600px; padding: 25px; border-radius: 15px; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h3 { margin-top: 0; color: var(--main-blue); }
+        input { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #444; color: white; border-radius: 8px; box-sizing: border-box; outline: none; }
+        input:focus { border-color: var(--main-blue); }
+        
+        /* Лента видео */
+        .feed-container { padding: 0 5%; max-width: 1400px; margin: 0 auto; }
+        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; margin-top: 30px; }
+        .video-card { background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid #333; transition: 0.3s; }
+        .video-card:hover { border-color: var(--main-blue); }
+        .video-card video { width: 100%; aspect-ratio: 16/9; background: #000; display: block; }
+        
+        .info { padding: 15px; }
+        .title { margin: 0; font-size: 1.1rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .author { color: #aaa; font-size: 0.85rem; margin-top: 8px; display: flex; align-items: center; }
+        .author::before { content: "●"; color: var(--main-blue); margin-right: 5px; font-size: 0.7rem; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>AXIS PROJECT</h1>
-        <p>Advanced AI Systems & Software Development</p>
-        <div class="status">System: Online</div>
-        <p style="margin-top: 40px; font-size: 0.8rem; color: #484f58;">© 2026 AxisProject inc. All rights reserved.</p>
+
+<nav>
+    <a href="#" class="logo">AXIS TUBE</a>
+    <div id="userArea">
+        <button class="btn" id="loginBtn">Войти через Google</button>
     </div>
+</nav>
+
+<div id="uploadSection">
+    <h3>Новое видео</h3>
+    <input type="text" id="videoTitle" placeholder="Назови свой шедевр...">
+    <input type="text" id="videoUrl" placeholder="Прямая ссылка на видео (mp4)...">
+    <button class="btn" style="width:100%" id="submitBtn">Опубликовать</button>
+</div>
+
+<div class="feed-container">
+    <h2 id="feedStatus">Загрузка ленты...</h2>
+    <div class="video-grid" id="feed"></div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getDatabase, ref, push, onValue, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    // ТВОЙ КОНФИГ ИЗ КОНСОЛИ
+    const firebaseConfig = {
+        apiKey: "AIzaSyDw6J2bx2-K86qeP_fPVbpwE30iZIAU-Gk", 
+        authDomain: "axistube-31fee.firebaseapp.com",
+        databaseURL: "https://axistube-31fee-default-rtdb.firebaseio.com",
+        projectId: "axistube-31fee",
+        storageBucket: "axistube-31fee.firebasestorage.app",
+        messagingSenderId: "261441549369",
+        appId: "1:261441549369:web:6ee655221cc0078377c9e8"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+    const provider = new GoogleAuthProvider();
+
+    // Элементы управления
+    const loginBtn = document.getElementById('loginBtn');
+    const userArea = document.getElementById('userArea');
+    const uploadSection = document.getElementById('uploadSection');
+    const feed = document.getElementById('feed');
+    const feedStatus = document.getElementById('feedStatus');
+
+    // Логика входа
+    loginBtn.onclick = () => signInWithPopup(auth, provider).catch(err => alert("Ошибка: " + err.message));
+
+    // Проверка состояния юзера
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            userArea.innerHTML = `<span>${user.displayName}</span><button class="btn btn-logout" id="logoutBtn">Выйти</button>`;
+            uploadSection.style.display = 'block';
+            document.getElementById('logoutBtn').onclick = () => signOut(auth);
+        } else {
+            userArea.innerHTML = `<button class="btn" id="loginBtn">Войти через Google</button>`;
+            uploadSection.style.display = 'none';
+            // Переназначение события для новой кнопки
+            document.getElementById('loginBtn').onclick = () => signInWithPopup(auth, provider);
+        }
+    });
+
+    // Опубликовать видео в базу
+    document.getElementById('submitBtn').onclick = () => {
+        const title = document.getElementById('videoTitle').value;
+        const url = document.getElementById('videoUrl').value;
+        
+        if (title && url) {
+            push(ref(db, 'videos'), {
+                title: title,
+                url: url,
+                author: auth.currentUser.displayName,
+                timestamp: serverTimestamp()
+            }).then(() => {
+                document.getElementById('videoTitle').value = '';
+                document.getElementById('videoUrl').value = '';
+                alert("Видео успешно добавлено!");
+            });
+        } else {
+            alert("Заполни все поля!");
+        }
+    };
+
+    // Слушаем базу данных в реальном времени
+    onValue(ref(db, 'videos'), (snapshot) => {
+        feed.innerHTML = '';
+        if (snapshot.exists()) {
+            feedStatus.innerText = "Свежее в AxisTube";
+            const data = snapshot.val();
+            // Выводим в обратном порядке (новые сверху)
+            Object.values(data).reverse().forEach(video => {
+                feed.innerHTML += `
+                    <div class="video-card">
+                        <video src="${video.url}" controls poster="https://via.placeholder.com/640x360/1e1e1e/58a6ff?text=Axis+Video"></video>
+                        <div class="info">
+                            <h4 class="title">${video.title}</h4>
+                            <div class="author">От: ${video.author}</div>
+                        </div>
+                    </div>`;
+            });
+        } else {
+            feedStatus.innerText = "Видео пока нет. Будь первым!";
+        }
+    });
+</script>
+
 </body>
 </html>
