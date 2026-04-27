@@ -3,31 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Axis AI | Platform</title>
+    <title>Axis Ecosystem | Platform</title>
     <style>
-        :root { --oa-green: #10a37f; --oa-bg: #0b0d0e; --sidebar: #000000; --card: #171717; }
+        :root { --oa-green: #10a37f; --oa-bg: #0b0d0e; --sidebar: #000000; --card: #171717; --accent: #2d2d2d; }
         body { background: var(--oa-bg); color: #ececf1; font-family: 'Inter', sans-serif; margin: 0; display: flex; height: 100vh; overflow: hidden; }
         
-        .sidebar { width: 260px; background: var(--sidebar); border-right: 1px solid #2d2d2d; display: flex; flex-direction: column; padding: 15px; }
-        .nav-item { padding: 12px; margin: 4px 0; border-radius: 8px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; font-size: 0.9rem; }
-        .nav-item:hover { background: #2d2d2d; }
-        .nav-item.active { background: #212121; border: 1px solid #444; }
-        .logo-box { font-weight: bold; color: var(--oa-green); margin-bottom: 30px; padding: 10px; font-size: 1.2rem; }
+        /* Sidebar */
+        .sidebar { width: 260px; background: var(--sidebar); border-right: 1px solid var(--accent); display: flex; flex-direction: column; padding: 15px; }
+        .logo-box { font-weight: bold; color: var(--oa-green); margin-bottom: 30px; padding: 10px; font-size: 1.2rem; letter-spacing: 1px; }
+        .nav-item { padding: 12px; margin: 4px 0; border-radius: 10px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; font-size: 0.9rem; color: #acacbe; }
+        .nav-item:hover { background: #2d2d2d; color: white; }
+        .nav-item.active { background: #212121; border: 1px solid #444; color: white; }
 
-        main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; position: relative; }
-        .content-section { display: none; padding: 40px; width: 100%; max-width: 900px; margin: 0 auto; }
+        /* Main Content */
+        main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; background: linear-gradient(180deg, #101214 0%, #0b0d0e 100%); }
+        .content-section { display: none; padding: 40px; width: 100%; max-width: 1100px; margin: 0 auto; animation: fadeIn 0.4s ease; }
         .content-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; margin-top: 20px; }
-        .video-card { background: var(--card); border: 1px solid #333; border-radius: 12px; overflow: hidden; }
+        /* Grid & Cards */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .shorts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
+        .card { background: var(--card); border: 1px solid #333; border-radius: 12px; overflow: hidden; transition: 0.3s; position: relative; }
+        .card:hover { border-color: var(--oa-green); transform: translateY(-5px); }
         .video-container { width: 100%; aspect-ratio: 16/9; background: #000; }
+        .short-container { width: 100%; aspect-ratio: 9/16; background: #000; }
         iframe, video { width: 100%; height: 100%; border: none; }
 
-        .chat-input { background: #212121; border: 1px solid #444; border-radius: 12px; padding: 15px; margin-bottom: 30px; }
-        input { background: transparent; border: none; color: white; width: 100%; outline: none; margin-bottom: 10px; font-size: 1rem; }
-        .btn { background: var(--oa-green); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; float: right; }
-        
-        .api-key-box { background: #000; border: 1px dashed var(--oa-green); padding: 15px; border-radius: 8px; font-family: monospace; margin-top: 20px; }
+        /* Input / Studio Area */
+        .studio-panel { background: rgba(255,255,255,0.03); border: 1px solid #333; border-radius: 15px; padding: 25px; margin-bottom: 30px; }
+        input, select { background: #000; border: 1px solid #444; color: white; width: 100%; padding: 12px; border-radius: 8px; margin-bottom: 15px; outline: none; }
+        .btn { background: var(--oa-green); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+
+        /* Roadmap List */
+        .roadmap-item { border-left: 2px solid var(--oa-green); padding-left: 20px; margin-bottom: 20px; color: #888; }
+        .roadmap-item b { color: white; display: block; margin-bottom: 5px; }
     </style>
 </head>
 <body>
@@ -35,37 +45,54 @@
 <div class="sidebar">
     <div class="logo-box">AXIS PROJECT</div>
     <div class="nav-item active" onclick="showPage('tube-page', this)">📺 AxisTube</div>
+    <div class="nav-item" onclick="showPage('shorts-page', this)">📱 Shorts</div>
     <div class="nav-item" onclick="showPage('ai-page', this)">🧠 AxisAI</div>
+    <div class="nav-item" onclick="showPage('studio-page', this)">🎨 Studio</div>
     <div class="nav-item" onclick="showPage('acc-page', this)">⚙️ Account</div>
-    <div style="margin-top: auto; padding: 10px; font-size: 0.8rem; color: #888;" id="userTag">Log in to start</div>
+    <div style="margin-top: auto; padding: 10px; font-size: 0.8rem; color: #888;" id="userTag">Offline</div>
 </div>
 
 <main>
     <section id="tube-page" class="content-section active">
         <h2>AxisTube Feed</h2>
-        <div id="uploadBox" class="chat-input" style="display:none;">
-            <input type="text" id="vTitle" placeholder="Название твоего видео...">
-            <input type="text" id="vUrl" placeholder="Ссылка на YouTube или прямая ссылка .mp4">
-            <button class="btn" id="postBtn">Опубликовать со звуком</button>
-            <div style="clear:both"></div>
-        </div>
-        <div class="video-grid" id="videoFeed"></div>
+        <div class="grid" id="videoFeed"></div>
+    </section>
+
+    <section id="shorts-page" class="content-section">
+        <h2>Shorts Shelf</h2>
+        <div class="shorts-grid" id="shortsFeed"></div>
     </section>
 
     <section id="ai-page" class="content-section">
-        <h1 style="color: var(--oa-green)">AxisAI Vision</h1>
-        <div style="background: #171717; padding: 40px; border-radius: 20px; text-align: center; border: 1px solid #333;">
-            <h2>Система в разработке</h2>
-            <p style="color:#888">Функции AxisAI станут доступны после релиза v2.0</p>
+        <h1 style="color: var(--oa-green)">AxisAI Roadmap</h1>
+        <div class="roadmap-item"><b>v1.5 - Neural Search</b><p>Поиск видео по смыслу и содержанию через эмбеддинги.</p></div>
+        <div class="roadmap-item"><b>v2.0 - Vision Engine</b><p>Автоматическая генерация субтитров и описание контента.</p></div>
+        <div class="roadmap-item"><b>v3.0 - Axis Voice</b><p>Озвучка видео на 50+ языков в реальном времени.</p></div>
+    </section>
+
+    <section id="studio-page" class="content-section">
+        <h2>Творческая студия</h2>
+        <div class="studio-panel" id="uploadBox" style="display:none;">
+            <h3>Опубликовать новый контент</h3>
+            <input type="text" id="vTitle" placeholder="Заголовок...">
+            <input type="text" id="vUrl" placeholder="Ссылка (YouTube или MP4)...">
+            <select id="vType">
+                <option value="video">Обычное видео (16:9)</option>
+                <option value="short">Shorts (9:16)</option>
+            </select>
+            <button class="btn" id="postBtn">Опубликовать</button>
         </div>
+        <p id="studioMsg">Войдите в аккаунт, чтобы загружать видео.</p>
     </section>
 
     <section id="acc-page" class="content-section">
-        <h2>Настройки аккаунта</h2>
-        <div id="authRequired"><button class="btn" onclick="login()">Login with Google</button></div>
+        <h2>Настройки</h2>
+        <div id="authRequired"><button class="btn" onclick="login()">Login via Google</button></div>
         <div id="accInfo" style="display:none;">
-            <p>User: <b id="userName"></b></p>
-            <div class="api-key-box"><small>API_KEY:</small><br><span id="apiKey"></span></div>
+            <p>ID: <span id="userName" style="color:var(--oa-green)"></span></p>
+            <div style="background:#000; padding:15px; border-radius:8px; font-family:monospace; border:1px solid #333;">
+                <small>PROJECT_SK:</small><br><span id="apiKey"></span>
+            </div>
         </div>
     </section>
 </main>
@@ -89,10 +116,10 @@
     const db = getDatabase(app);
     const provider = new GoogleAuthProvider();
 
-    window.showPage = (pageId, el) => {
+    window.showPage = (id, el) => {
         document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-        document.getElementById(pageId).classList.add('active');
+        document.getElementById(id).classList.add('active');
         el.classList.add('active');
     };
 
@@ -102,6 +129,7 @@
         if (user) {
             document.getElementById('userTag').innerText = user.displayName;
             document.getElementById('uploadBox').style.display = 'block';
+            document.getElementById('studioMsg').style.display = 'none';
             document.getElementById('authRequired').style.display = 'none';
             document.getElementById('accInfo').style.display = 'block';
             document.getElementById('userName').innerText = user.displayName;
@@ -109,26 +137,26 @@
         }
     });
 
-    function getEmbedUrl(url) {
+    function getEmbed(url) {
         if (url.includes('youtu.be')) return `https://www.youtube.com/embed/${url.split('/').pop().split('?')[0]}`;
         if (url.includes('youtube.com')) return `https://www.youtube.com/embed/${new URLSearchParams(new URL(url).search).get('v')}`;
         return null;
     }
 
     document.getElementById('postBtn').onclick = () => {
-        const t = document.getElementById('vTitle').value;
-        const u = document.getElementById('vUrl').value;
-        if(t && u) push(ref(db, 'videos'), { title: t, url: u, author: auth.currentUser.displayName });
+        const t = document.getElementById('vTitle').value, u = document.getElementById('vUrl').value, type = document.getElementById('vType').value;
+        if(t && u) push(ref(db, 'content'), { title: t, url: u, author: auth.currentUser.displayName, type: type });
     };
 
-    onValue(ref(db, 'videos'), (s) => {
-        const feed = document.getElementById('videoFeed');
-        feed.innerHTML = '';
+    onValue(ref(db, 'content'), (s) => {
+        const tube = document.getElementById('videoFeed'), shorts = document.getElementById('shortsFeed');
+        tube.innerHTML = ''; shorts.innerHTML = '';
         s.forEach(child => {
             const v = child.val();
-            const embed = getEmbedUrl(v.url);
-            const player = embed ? `<iframe src="${embed}" allowfullscreen allow="autoplay; encrypted-media"></iframe>` : `<video src="${v.url}" controls></video>`;
-            feed.innerHTML += `<div class="video-card"><div class="video-container">${player}</div><div style="padding:12px"><b>${v.title}</b><br><small>by ${v.author}</small></div></div>`;
+            const embed = getEmbed(v.url);
+            const player = embed ? `<iframe src="${embed}" allowfullscreen></iframe>` : `<video src="${v.url}" controls></video>`;
+            const html = `<div class="card"><div class="${v.type === 'short' ? 'short-container' : 'video-container'}">${player}</div><div style="padding:12px"><b>${v.title}</b><br><small>${v.author}</small></div></div>`;
+            if(v.type === 'short') shorts.innerHTML += html; else tube.innerHTML += html;
         });
     });
 </script>
