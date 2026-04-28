@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AxisSite | User Discovery</title>
+    <title>AxisSite | Shorts & Users Return</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root { --accent: #10a37f; --bg: #0b0d0e; --card: #171717; }
         body { background: var(--bg); color: #ececf1; font-family: 'Inter', sans-serif; margin: 0; display: flex; height: 100vh; overflow: hidden; }
         
+        /* Sidebar */
         .sidebar { width: 260px; background: #000; border-right: 1px solid #333; padding: 20px; display: flex; flex-direction: column; flex-shrink: 0; }
-        .nav-item { padding: 12px; margin: 4px 0; border-radius: 10px; cursor: pointer; color: #888; display: flex; align-items: center; }
-        .nav-item.active { background: #212121; color: var(--accent); border: 1px solid #333; }
+        .nav-item { padding: 12px; margin: 4px 0; border-radius: 10px; cursor: pointer; color: #888; display: flex; align-items: center; transition: 0.2s; }
+        .nav-item.active { background: #212121; color: var(--accent); border: 1px solid #333; font-weight: 600; }
 
         main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
         .top-bar { padding: 15px 25px; background: rgba(11, 13, 14, 0.9); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #222; }
@@ -20,25 +21,27 @@
         .content-section { display: none; padding: 25px; }
         .content-section.active { display: block; }
 
-        /* Поиск пользователей */
-        .user-search-box { background: #111; padding: 20px; border-radius: 15px; border: 1px solid #333; margin-bottom: 30px; }
-        .user-result { display: flex; align-items: center; gap: 15px; padding: 10px; border-bottom: 1px solid #222; }
-        .user-mini-ava { width: 40px; height: 40px; border-radius: 50%; background: var(--accent); object-fit: cover; }
-        
-        /* Шапка канала */
+        /* Видео сетки */
+        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .shorts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
+        .v-card { background: var(--card); border-radius: 15px; border: 1px solid #333; overflow: hidden; }
+        iframe { width: 100%; aspect-ratio: 16/9; border: none; display: block; }
+        .shorts-iframe { aspect-ratio: 9/16; } /* Пропорции для шортсов */
+
+        /* Профиль */
         .header-container { width: 100%; position: relative; margin-bottom: 40px; }
         .banner { width: 100%; height: 180px; border-radius: 20px; object-fit: cover; background: #222; border: 1px solid #333; }
         .profile-bar { display: flex; align-items: center; gap: 20px; padding: 0 30px; margin-top: -50px; }
         .avatar { width: 100px; height: 100px; border-radius: 50%; border: 6px solid var(--bg); background: var(--accent); overflow: hidden; }
         .avatar img { width: 100%; height: 100%; object-fit: cover; }
 
-        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-        .v-card { background: var(--card); border-radius: 15px; border: 1px solid #333; overflow: hidden; }
-        iframe { width: 100%; aspect-ratio: 16/9; border: none; }
-        
+        /* Поиск людей */
+        .user-search-box { background: #111; padding: 20px; border-radius: 15px; border: 1px solid #333; margin-bottom: 30px; }
+        .user-result { display: flex; align-items: center; gap: 15px; padding: 10px; border-bottom: 1px solid #222; }
+        .user-mini-ava { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+
         .btn-action { background: #222; border: 1px solid #333; color: #fff; padding: 8px 15px; border-radius: 8px; cursor: pointer; }
         .btn-sub { background: var(--accent); border: none; font-weight: 600; }
-        
         input[type="text"] { width: 100%; padding: 10px; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; box-sizing: border-box; }
     </style>
 </head>
@@ -47,17 +50,24 @@
 <div class="sidebar">
     <div style="font-weight:bold; font-size:1.5rem; margin-bottom:30px; color:var(--accent)">AxisSite</div>
     <div class="nav-item active" onclick="showPage('home', this)">📺 Лента</div>
+    <div class="nav-item" onclick="showPage('shorts-page', this)">📱 Shorts</div>
     <div class="nav-item" id="nav-chan" onclick="showPage('my-channel', this)">👤 Мой канал</div>
     <div class="nav-item" onclick="showPage('studio', this)">🎨 Загрузить</div>
 </div>
 
 <main>
     <div class="top-bar">
-        <input type="text" id="searchInp" placeholder="Поиск видео..." oninput="renderContent()">
+        <input type="text" id="searchInp" placeholder="Поиск видео..." oninput="renderApp()">
     </div>
 
     <section id="home" class="content-section active">
+        <h2>Рекомендации</h2>
         <div class="video-grid" id="mainFeed"></div>
+    </section>
+
+    <section id="shorts-page" class="content-section">
+        <h2>Короткие Shorts</h2>
+        <div class="shorts-grid" id="shortsFeed"></div>
     </section>
 
     <section id="my-channel" class="content-section">
@@ -65,28 +75,27 @@
             <img id="uBanner" src="https://images.unsplash.com/photo-1614850523296-d8c1af93d400?q=80" class="banner">
             <div class="profile-bar">
                 <div class="avatar" id="uAva"></div>
-                <div>
-                    <h1 id="uName" style="margin:0">Creator</h1>
-                </div>
+                <div><h1 id="uName" style="margin:0">Загрузка...</h1></div>
             </div>
         </div>
 
         <div class="user-search-box">
-            <h3>Найти пользователей Axis</h3>
-            <input type="text" id="userSearchInp" placeholder="Введите имя участника..." oninput="searchUsers()">
-            <div id="userResults" style="margin-top:15px;"></div>
+            <h3>Найти пользователей</h3>
+            <input type="text" id="userSearchInp" placeholder="Введите имя..." oninput="searchUsers()">
+            <div id="userResults"></div>
         </div>
 
-        <h3>Ваши публикации</h3>
+        <h3>Ваши видео</h3>
         <div class="video-grid" id="myFeed"></div>
     </section>
 
     <section id="studio" class="content-section">
         <div style="background:#111; padding:25px; border-radius:15px; max-width:450px;">
-            <h3>Опубликовать</h3>
+            <h3>Студия</h3>
             <input type="text" id="vTitle" placeholder="Название"><br><br>
             <input type="text" id="vUrl" placeholder="ID YouTube"><br><br>
-            <button class="btn-action btn-sub" style="width:100%" onclick="postVideo()">Загрузить</button>
+            <label><input type="checkbox" id="isShort"> Это вертикальный Shorts</label><br><br>
+            <button class="btn-action btn-sub" style="width:100%" onclick="postVideo()">Опубликовать</button>
         </div>
     </section>
 </main>
@@ -112,20 +121,15 @@
 
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            // Сохраняем/обновляем текущего пользователя в общей базе для поиска
-            update(ref(db, `users/${user.uid}`), { name: user.displayName, lastSeen: Date.now() });
-
+            update(ref(db, `users/${user.uid}`), { name: user.displayName });
             onValue(ref(db, `users/${user.uid}`), (s) => {
                 const d = s.val();
                 document.getElementById('uName').innerText = d?.name || user.displayName;
                 if(d?.avatar) document.getElementById('uAva').innerHTML = `<img src="${d.avatar}">`;
                 if(d?.banner) document.getElementById('uBanner').src = d.banner;
             });
-            
-            // Загружаем список всех пользователей для поиска
             onValue(ref(db, 'users'), (snap) => {
-                allUsers = [];
-                snap.forEach(u => { allUsers.push({ id: u.key, ...u.val() }); });
+                allUsers = []; snap.forEach(u => allUsers.push({id: u.key, ...u.val()}));
             });
         } else { signInWithPopup(auth, new GoogleAuthProvider()); }
     });
@@ -134,7 +138,12 @@
         document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         document.getElementById(id).classList.add('active');
-        if(el) el.classList.add('active');
+        el.classList.add('active');
+    };
+
+    window.postVideo = () => {
+        const t = document.getElementById('vTitle').value, u = document.getElementById('vUrl').value, s = document.getElementById('isShort').checked;
+        if(t && u) push(ref(db, 'videos'), { title: t, url: u, type: s ? 'short' : 'video', author: auth.currentUser.displayName, uid: auth.currentUser.uid });
     };
 
     window.searchUsers = () => {
@@ -142,14 +151,12 @@
         const res = document.getElementById('userResults');
         res.innerHTML = '';
         if(q.length < 2) return;
-
         allUsers.forEach(u => {
             if(u.name.toLowerCase().includes(q)) {
-                res.innerHTML += `
-                <div class="user-result">
+                res.innerHTML += `<div class="user-result">
                     <img src="${u.avatar || 'https://via.placeholder.com/40'}" class="user-mini-ava">
                     <span style="flex:1"><b>${u.name}</b></span>
-                    <button class="btn-action" onclick="goToUser('${u.name}')">Смотреть канал</button>
+                    <button class="btn-action" onclick="goToUser('${u.name}')">Канал</button>
                 </div>`;
             }
         });
@@ -157,36 +164,31 @@
 
     window.goToUser = (name) => {
         document.getElementById('searchInp').value = name;
-        renderContent();
+        renderApp();
         showPage('home', document.querySelector('.nav-item'));
     };
 
-    window.postVideo = () => {
-        const t = document.getElementById('vTitle').value, u = document.getElementById('vUrl').value;
-        if(t && u) push(ref(db, 'videos'), { title: t, url: u, author: auth.currentUser.displayName, uid: auth.currentUser.uid });
-    };
-
-    window.renderContent = () => {
+    window.renderApp = () => {
         const q = document.getElementById('searchInp').value.toLowerCase();
-        let h = '', m = '';
+        let h = '', s = '', m = '';
         vids.forEach(v => {
             if(v.val.title.toLowerCase().includes(q) || v.val.author.toLowerCase().includes(q)) {
                 const card = `<div class="v-card">
-                    <iframe src="https://www.youtube.com/embed/${v.val.url}"></iframe>
+                    <iframe class="${v.val.type === 'short' ? 'shorts-iframe' : ''}" src="https://www.youtube.com/embed/${v.val.url}"></iframe>
                     <div style="padding:10px"><b>${v.val.title}</b><br><small>@${v.val.author}</small></div>
                 </div>`;
-                h += card;
+                if(v.val.type === 'short') s += card; else h += card;
                 if(v.val.uid === auth.currentUser?.uid) m += card;
             }
         });
         document.getElementById('mainFeed').innerHTML = h;
+        document.getElementById('shortsFeed').innerHTML = s;
         document.getElementById('myFeed').innerHTML = m;
     };
 
     onValue(ref(db, 'videos'), (snap) => {
-        vids = [];
-        snap.forEach(c => vids.push({key: c.key, val: c.val()}));
-        renderContent();
+        vids = []; snap.forEach(c => vids.push({key: c.key, val: c.val()}));
+        renderApp();
     });
 </script>
 </body>
