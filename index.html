@@ -3,145 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Axis Ultimate | v4.0</title>
+    <title>Axis Site | Admin Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        /* Базовые переменные и Темы */
-        :root { 
-            --accent: #10a37f; 
-            --bg: #0b0d0e; 
-            --card: #171717; 
-            --glass: rgba(255, 255, 255, 0.05);
-            --accent-bg: var(--accent);
-        }
-
-        /* Цвета тем */
+        :root { --accent: #10a37f; --bg: #0b0d0e; --card: #171717; --glass: rgba(255, 255, 255, 0.05); --accent-bg: var(--accent); }
         .theme-pink { --accent: #ff69b4; }
-        .theme-blue { --accent: #3498db; }
-        .theme-green { --accent: #10a37f; }
-
-        /* Логика градиента */
-        .gradient-on { 
-            --accent-bg: linear-gradient(135deg, var(--accent) 0%, #6a11cb 100%); 
-        }
-        .theme-pink.gradient-on { 
-            --accent-bg: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%); 
-        }
+        .gradient-on { --accent-bg: linear-gradient(135deg, var(--accent) 0%, #6a11cb 100%); }
+        .theme-pink.gradient-on { --accent-bg: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%); }
 
         * { box-sizing: border-box; transition: all 0.3s ease; }
         body { background: var(--bg); color: #ececf1; font-family: 'Inter', sans-serif; margin: 0; display: flex; height: 100vh; overflow: hidden; }
         
-        /* Sidebar */
         .sidebar { width: 260px; background: #000; border-right: 1px solid #2d2d2d; display: flex; flex-direction: column; padding: 20px; }
-        .logo { font-weight: 600; color: var(--accent); margin-bottom: 40px; font-size: 1.3rem; display: flex; align-items: center; }
-        .logo::before { content: ''; width: 12px; height: 12px; background: var(--accent-bg); border-radius: 3px; margin-right: 10px; }
-        
-        .nav-item { padding: 12px 15px; margin: 5px 0; border-radius: 12px; cursor: pointer; display: flex; align-items: center; font-size: 0.95rem; color: #8e8ea0; }
-        .nav-item:hover { background: var(--glass); }
+        .logo { font-weight: 600; color: var(--accent); margin-bottom: 40px; font-size: 1.3rem; }
+        .nav-item { padding: 12px 15px; margin: 4px 0; border-radius: 12px; cursor: pointer; display: flex; align-items: center; font-size: 0.95rem; color: #8e8ea0; }
         .nav-item.active { background: var(--accent-bg); color: white; }
+        .admin-only { display: none; border: 1px dashed var(--accent); margin-top: 20px; }
 
-        /* Main */
-        main { flex: 1; overflow-y: auto; padding: 40px; }
-        .page { display: none; max-width: 900px; margin: 0 auto; animation: fadeIn 0.3s ease; }
+        main { flex: 1; overflow-y: auto; }
+        .page { display: none; max-width: 1100px; margin: 0 auto; padding: 20px; animation: fadeIn 0.3s ease; }
         .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Cards & Studio */
-        .settings-card { background: var(--card); border: 1px solid #333; border-radius: 20px; padding: 25px; margin-bottom: 20px; }
-        input, select { background: #000; border: 1px solid #444; color: white; width: 100%; padding: 12px; border-radius: 10px; margin-bottom: 15px; outline: none; }
-        input:focus { border-color: var(--accent); }
-        .btn { background: var(--accent-bg); color: white; border: none; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-weight: 600; width: 100%; }
+        .card { background: var(--card); border-radius: 15px; padding: 20px; border: 1px solid #333; margin-bottom: 20px; }
+        .btn { background: var(--accent-bg); color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: 600; }
+        .btn-danger { background: #ff4444; margin-top: 5px; font-size: 0.8rem; width: 100%; }
 
-        /* Theme Selectors */
-        .color-picker { display: flex; gap: 10px; margin-bottom: 20px; }
-        .color-btn { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #fff; cursor: pointer; }
-        
-        /* Switch */
-        .switch-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .switch { position: relative; width: 40px; height: 20px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #333; border-radius: 20px; }
-        .slider:before { content: ""; position: absolute; height: 14px; width: 14px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: .3s; }
-        input:checked + .slider { background: var(--accent); }
-        input:checked + .slider:before { transform: translateX(20px); }
+        /* Video Grid */
+        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+        .v-item { background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid #333; position: relative; }
+        iframe { width: 100%; aspect-ratio: 16/9; border: none; }
 
-        /* Feed */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-        .v-card { background: var(--card); border-radius: 15px; overflow: hidden; border: 1px solid #2d2d2d; }
-        .v-thumb { width: 100%; aspect-ratio: 16/9; background: #000; }
-        iframe { width: 100%; height: 100%; border: none; }
+        /* Admin Table */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #333; }
+        .ban-status { color: #ff4444; font-weight: bold; }
     </style>
 </head>
 <body class="theme-green">
 
 <div class="sidebar">
-    <div class="logo" id="dynamicLogo">AXIS ULTIMATE</div>
-    <div class="nav-item active" onclick="showPage('tube', this)">📺 Tube</div>
-    <div class="nav-item" onclick="showPage('shorts', this)">📱 Shorts</div>
-    <div class="nav-item" onclick="showPage('studio', this)">🎨 Studio</div>
-    <div class="nav-item" onclick="showPage('acc', this)">⚙️ Account</div>
+    <div class="logo">AXIS ADMIN</div>
+    <div class="nav-item active" onclick="showPage('home', this)">📺 Лента</div>
+    <div class="nav-item" onclick="showPage('studio', this)">🎨 Загрузить</div>
+    <div class="nav-item" onclick="showPage('profile', this)">⚙️ Мой Канал</div>
+    <div class="nav-item admin-only" id="adminTab" onclick="showPage('admin', this)">🛡️ Модерация</div>
 </div>
 
 <main>
-    <section id="page-tube" class="page active">
-        <h2>AxisTube</h2>
-        <div class="grid" id="tubeFeed"></div>
-    </section>
-
-    <section id="page-shorts" class="page">
-        <h2>Shorts</h2>
-        <div class="grid" id="shortsFeed" style="grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));"></div>
+    <section id="page-home" class="page active">
+        <h2>Общая лента</h2>
+        <div class="video-grid" id="mainFeed"></div>
     </section>
 
     <section id="page-studio" class="page">
-        <h2>Creative Studio</h2>
-        <div class="settings-card">
-            <input type="text" id="vTitle" placeholder="Название...">
-            <input type="text" id="vUrl" placeholder="YouTube ссылка...">
-            <select id="vType"><option value="tube">Видео (16:9)</option><option value="short">Shorts (9:16)</option></select>
+        <h2>Добавить видео</h2>
+        <div class="card">
+            <input type="text" id="vTitle" placeholder="Название..." style="width:100%; padding:10px; margin-bottom:10px; background:#000; color:#fff; border:1px solid #444; border-radius:8px;">
+            <input type="text" id="vUrl" placeholder="Ссылка на YouTube..." style="width:100%; padding:10px; margin-bottom:10px; background:#000; color:#fff; border:1px solid #444; border-radius:8px;">
             <button class="btn" onclick="postVideo()">Опубликовать</button>
         </div>
     </section>
 
-    <section id="page-acc" class="page">
-        <h2>Настройки профиля</h2>
-        <div id="authBox">
-            <div class="settings-card">
-                <div style="display:flex; align-items:center; gap:15px; margin-bottom:20px;">
-                    <img id="uAvatar" src="" style="width:60px; height:60px; border-radius:50%; border:2px solid var(--accent);">
-                    <div><h3 id="uName" style="margin:0">Загрузка...</h3><small>Verified User</small></div>
-                </div>
-                
-                <p>Изменить имя:</p>
-                <div style="display:flex; gap:10px;">
-                    <input type="text" id="newNameInput" placeholder="Новое имя..." style="margin-bottom:0;">
-                    <button class="btn" onclick="changeName()" style="width:auto;">Save</button>
-                </div>
-            </div>
-
-            <div class="settings-card">
-                <p>Цвет акцента:</p>
-                <div class="color-picker">
-                    <div class="color-btn" style="background:#10a37f" onclick="setTheme('green')"></div>
-                    <div class="color-btn" style="background:#ff69b4" onclick="setTheme('pink')"></div>
-                    <div class="color-btn" style="background:#3498db" onclick="setTheme('blue')"></div>
-                </div>
-                
-                <div class="switch-row">
-                    <span>Градиентный режим</span>
-                    <label class="switch"><input type="checkbox" id="gradToggle" onchange="toggleGrad()"><span class="slider"></span></label>
-                </div>
-            </div>
-            <button class="btn" style="background:#ea4335" onclick="logout()">Выйти</button>
+    <section id="page-profile" class="page">
+        <div class="card">
+            <h2 id="uNameDisplay">Профиль</h2>
+            <p>Тут настройки твоего канала (баннеры и аватарки из v6.0 работают).</p>
         </div>
-        <div id="noAuth" style="display:none; text-align:center;"><button class="btn" onclick="login()">Login</button></div>
+    </section>
+
+    <section id="page-admin" class="page">
+        <h2>Управление пользователями</h2>
+        <div class="card">
+            <table>
+                <thead>
+                    <tr><th>Имя</th><th>UID</th><th>Статус</th><th>Действие</th></tr>
+                </thead>
+                <tbody id="userList"></tbody>
+            </table>
+        </div>
     </section>
 </main>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, updateProfile, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getDatabase, ref, push, onValue, set, remove, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyDw6J2bx2-K86qeP_fPVbpwE30iZIAU-Gk",
@@ -156,6 +103,9 @@
     const db = getDatabase(app);
     const provider = new GoogleAuthProvider();
 
+    // ВСТАВЬ СВОЙ UID СЮДА!
+    const ADMIN_UID = "H9JYbowxIXOdQ7Ef3atMDNXXmxf1"; 
+
     window.showPage = (id, el) => {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
@@ -163,53 +113,89 @@
         el.classList.add('active');
     };
 
-    window.login = () => signInWithPopup(auth, provider);
-    window.logout = () => signOut(auth);
-
-    // СМЕНА ИМЕНИ (Одыкватная работа)
-    window.changeName = () => {
-        const name = document.getElementById('newNameInput').value;
-        if(name && auth.currentUser) {
-            updateProfile(auth.currentUser, { displayName: name }).then(() => {
-                document.getElementById('uName').innerText = name;
-                alert("Имя успешно обновлено!");
-            });
-        }
-    };
-
-    // ТЕМЫ И ГРАДИЕНТ
-    window.setTheme = (color) => {
-        document.body.className = 'theme-' + color + (document.getElementById('gradToggle').checked ? ' gradient-on' : '');
-    };
-    window.toggleGrad = () => {
-        document.body.classList.toggle('gradient-on');
-    };
-
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            document.getElementById('authBox').style.display = 'block';
-            document.getElementById('noAuth').style.display = 'none';
-            document.getElementById('uName').innerText = user.displayName;
-            document.getElementById('uAvatar').src = user.photoURL;
+            // Проверка на бан
+            onValue(ref(db, `users/${user.uid}/banned`), (s) => {
+                if(s.val() === true) {
+                    alert("ВЫ ЗАБАНЕНЫ!");
+                    signOut(auth);
+                    location.reload();
+                }
+            });
+
+            // Показываем админку если это ТЫ
+            if(user.uid === ADMIN_UID) {
+                document.getElementById('adminTab').style.display = 'flex';
+                loadUsersForAdmin();
+            }
+
+            document.getElementById('uNameDisplay').innerText = user.displayName;
+            // Регистрация пользователя в базе для списка админа
+            update(ref(db, `users/${user.uid}`), { name: user.displayName, email: user.email });
         } else {
-            document.getElementById('authBox').style.display = 'none';
-            document.getElementById('noAuth').style.display = 'block';
+            signInWithPopup(auth, provider);
         }
     });
 
     window.postVideo = () => {
-        const title = document.getElementById('vTitle').value, url = document.getElementById('vUrl').value, type = document.getElementById('vType').value;
-        if(title && url) push(ref(db, 'content'), { title, url, type, author: auth.currentUser.displayName });
+        const title = document.getElementById('vTitle').value, url = document.getElementById('vUrl').value;
+        if(title && url) push(ref(db, 'content'), { title, url, author: auth.currentUser.displayName, uid: auth.currentUser.uid });
     };
 
+    // Функция удаления для админа
+    window.deleteVideo = (id) => {
+        if(confirm("Удалить это видео навсегда?")) {
+            remove(ref(db, `content/${id}`));
+        }
+    };
+
+    // Функции админки
+    window.toggleBan = (uid, currentStatus) => {
+        update(ref(db, `users/${uid}`), { banned: !currentStatus });
+    };
+
+    function loadUsersForAdmin() {
+        onValue(ref(db, 'users'), (snap) => {
+            const list = document.getElementById('userList');
+            list.innerHTML = '';
+            snap.forEach(child => {
+                const u = child.val();
+                const uid = child.key;
+                list.innerHTML += `
+                    <tr>
+                        <td>${u.name}</td>
+                        <td style="font-size:10px">${uid}</td>
+                        <td class="${u.banned ? 'ban-status' : ''}">${u.banned ? 'BANNED' : 'Active'}</td>
+                        <td>
+                            <button class="btn" onclick="toggleBan('${uid}', ${u.banned || false})">${u.banned ? 'Unban' : 'Ban'}</button>
+                        </td>
+                    </tr>`;
+            });
+        });
+    }
+
+    // Рендер видео с кнопкой удаления
     onValue(ref(db, 'content'), (snap) => {
-        const tube = document.getElementById('tubeFeed'), shorts = document.getElementById('shortsFeed');
-        tube.innerHTML = ''; shorts.innerHTML = '';
+        const feed = document.getElementById('mainFeed');
+        feed.innerHTML = '';
         snap.forEach(child => {
             const v = child.val();
-            const id = v.url.includes('youtu.be') ? v.url.split('/').pop().split('?')[0] : new URLSearchParams(new URL(v.url).search).get('v');
-            const html = `<div class="v-card"><div class="v-thumb" style="${v.type==='short'?'aspect-ratio:9/16':''}"><iframe src="https://www.youtube.com/embed/${id}"></iframe></div><div style="padding:15px"><b>${v.title}</b><br><small>by ${v.author}</small></div></div>`;
-            if(v.type === 'short') shorts.innerHTML += html; else tube.innerHTML += html;
+            const vidId = v.url.includes('youtu.be') ? v.url.split('/').pop() : new URLSearchParams(new URL(v.url).search).get('v');
+            
+            let deleteBtn = '';
+            if(auth.currentUser && auth.currentUser.uid === ADMIN_UID) {
+                deleteBtn = `<button class="btn btn-danger" onclick="deleteVideo('${child.key}')">УДАЛИТЬ ВИДЕО</button>`;
+            }
+
+            feed.innerHTML += `
+                <div class="v-item">
+                    <iframe src="https://www.youtube.com/embed/${vidId}"></iframe>
+                    <div style="padding:10px">
+                        <b>${v.title}</b><br><small>${v.author}</small>
+                        ${deleteBtn}
+                    </div>
+                </div>`;
         });
     });
 </script>
