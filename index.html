@@ -3,78 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Axis Project | Platform</title>
+    <title>AxisSite</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root { --oa-green: #10a37f; --oa-bg: #0b0d0e; --card: #171717; }
         body { background: var(--oa-bg); color: #ececf1; font-family: 'Inter', sans-serif; margin: 0; display: flex; height: 100vh; }
         
         .sidebar { width: 260px; background: #000; border-right: 1px solid #333; padding: 20px; display: flex; flex-direction: column; }
-        .nav-item { padding: 12px; margin: 4px 0; border-radius: 10px; cursor: pointer; color: #888; display: flex; align-items: center; text-decoration: none; }
+        .nav-item { padding: 12px; margin: 4px 0; border-radius: 10px; cursor: pointer; color: #888; display: flex; align-items: center; }
         .nav-item.active { background: #212121; color: #fff; border: 1px solid #444; }
-        #modTab { border: 1px dashed var(--oa-green); margin-top: 20px; display: none; }
 
         main { flex: 1; overflow-y: auto; padding: 25px; }
         .content-section { display: none; }
         .content-section.active { display: block; }
 
-        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-        .video-card { background: var(--card); border-radius: 15px; border: 1px solid #333; overflow: hidden; }
-        .video-container { position: relative; width: 100%; aspect-ratio: 16/9; }
-        iframe { width: 100%; height: 100%; border: none; }
+        /* Шапка канала */
+        .channel-header { background: #111; padding: 30px; border-radius: 15px; margin-bottom: 25px; border: 1px solid #333; position: relative; }
+        .avatar-box { width: 80px; height: 80px; background: var(--oa-green); border-radius: 50%; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; font-size: 2rem; cursor: pointer; border: 3px solid #222; }
+        .edit-btn { position: absolute; top: 20px; right: 20px; font-size: 0.8rem; color: var(--oa-green); cursor: pointer; }
 
-        .btn { padding: 8px 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; margin: 5px; color: white; }
+        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; }
+        .video-card { background: var(--card); border-radius: 12px; border: 1px solid #333; overflow: hidden; padding-bottom: 10px; }
+        iframe { width: 100%; aspect-ratio: 16/9; border: none; }
+
+        .btn { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; color: white; width: 90%; margin: 5px 5%; }
         .btn-red { background: #ff4444; }
         .btn-green { background: var(--oa-green); }
-        .user-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #333; }
+        .admin-block { background: #111; padding: 15px; border-radius: 12px; border: 1px solid #222; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
 <div class="sidebar">
-    <div style="color: var(--oa-green); font-weight: bold; margin-bottom: 30px;">AXIS PROJECT</div>
+    <div style="color:var(--oa-green); font-weight:bold; margin-bottom:30px;">AxisSite</div>
     <div class="nav-item active" onclick="showPage('home', this)">📺 Лента</div>
     <div class="nav-item" onclick="showPage('shorts-page', this)">📱 Shorts</div>
+    <div class="nav-item" onclick="showPage('my-channel', this)">👤 Мой канал</div>
     <div class="nav-item" onclick="showPage('studio', this)">🎨 Загрузить</div>
-    <div class="nav-item" id="modTab" onclick="showPage('mod-page', this)">🛡️ Модерация</div>
+    <div class="nav-item" id="modTab" onclick="showPage('mod-page', this)" style="display:none;">🛡️ Модерация</div>
 </div>
 
 <main>
-    <section id="home" class="content-section active">
-        <h2>Актуальное</h2>
-        <div class="video-grid" id="videoFeed"></div>
-    </section>
+    <section id="home" class="content-section active"><h2>Актуальное</h2><div class="video-grid" id="videoFeed"></div></section>
+    
+    <section id="shorts-page" class="content-section"><h2>Shorts</h2><div class="video-grid" id="shortsFeed"></div></section>
 
-    <section id="shorts-page" class="content-section">
-        <h2>Shorts</h2>
-        <div class="video-grid" id="shortsFeed" style="grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));"></div>
+    <section id="my-channel" class="content-section">
+        <div class="channel-header">
+            <div class="edit-btn" onclick="alert('Настройки оформления в v9.0')">⚙️ Настройки</div>
+            <div class="avatar-box" id="userAvatar">👤</div>
+            <h2 id="channelName" style="margin:0">Загрузка...</h2>
+            <small id="userUID" style="color:#666"></small>
+        </div>
+        <h3>Ваши публикации</h3>
+        <div class="video-grid" id="myVideosFeed"></div>
     </section>
 
     <section id="studio" class="content-section">
-        <h2>Загрузить видео</h2>
-        <div style="background: #111; padding: 20px; border-radius: 15px;">
-            <input type="text" id="vTitle" placeholder="Название..." style="width: 100%; padding: 10px; margin-bottom: 10px; background: #000; color: #fff; border: 1px solid #333;">
-            <input type="text" id="vUrl" placeholder="Ссылка на YouTube..." style="width: 100%; padding: 10px; margin-bottom: 10px; background: #000; color: #fff; border: 1px solid #333;">
-            <label><input type="checkbox" id="isShort"> Это вертикальное видео (Shorts)</label><br><br>
-            <button class="btn btn-green" onclick="postVideo()">Опубликовать</button>
+        <h2>Загрузка</h2>
+        <div class="admin-block" id="uploadForm">
+            <input type="text" id="vTitle" placeholder="Название..." style="width:95%; padding:10px; margin-bottom:10px; background:#000; color:#fff; border:1px solid #333;">
+            <input type="text" id="vUrl" placeholder="Ссылка YouTube..." style="width:95%; padding:10px; margin-bottom:10px; background:#000; color:#fff; border:1px solid #333;">
+            <label><input type="checkbox" id="isShort"> Это Shorts</label><br><br>
+            <button class="btn btn-green" style="width:200px" onclick="postVideo()">Опубликовать</button>
+        </div>
+        <div id="banMessage" style="display:none; color:red; text-align:center; padding:20px;">
+            Вы заблокированы и не можете публиковать видео.
         </div>
     </section>
 
     <section id="mod-page" class="content-section">
-        <h2>Панель модерации</h2>
-        <div style="background: #111; padding: 20px; border-radius: 15px;">
-            <h3>Пользователи</h3>
-            <div id="userList"></div>
-            <h3 style="margin-top: 30px;">Корзина</h3>
-            <div id="deletedFeed" class="video-grid"></div>
-        </div>
+        <h2>Модерация</h2>
+        <div class="admin-block"><h3>Управление юзерами</h3><div id="userList"></div></div>
+        <div class="admin-block"><h3>Корзина</h3><div id="trashFeed" class="video-grid"></div></div>
     </section>
 </main>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getDatabase, ref, onValue, update, push, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { getDatabase, ref, onValue, push, update, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyDw6J2bx2-K86qeP_fPVbpwE30iZIAU-Gk",
@@ -98,18 +106,24 @@
 
     onAuthStateChanged(auth, (user) => {
         if (user) {
+            document.getElementById('channelName').innerText = user.displayName;
+            document.getElementById('userUID').innerText = "UID: " + user.uid;
             if (user.uid === ADMIN_UID) document.getElementById('modTab').style.display = 'flex';
+            
+            // Проверка бана
+            onValue(ref(db, `users/${user.uid}`), (s) => {
+                if (s.val()?.isBanned) {
+                    document.getElementById('uploadForm').style.display = 'none';
+                    document.getElementById('banMessage').style.display = 'block';
+                }
+            });
             update(ref(db, `users/${user.uid}`), { name: user.displayName, uid: user.uid });
-        } else {
-            signInWithPopup(auth, new GoogleAuthProvider());
-        }
+        } else { signInWithPopup(auth, new GoogleAuthProvider()); }
     });
 
     window.postVideo = () => {
-        const t = document.getElementById('vTitle').value;
-        const u = document.getElementById('vUrl').value;
-        const s = document.getElementById('isShort').checked;
-        if(t && u) push(ref(db, 'videos'), { title: t, url: u, type: s ? 'short' : 'video', author: auth.currentUser.displayName });
+        const t = document.getElementById('vTitle').value, u = document.getElementById('vUrl').value, s = document.getElementById('isShort').checked;
+        if(t && u) push(ref(db, 'videos'), { title: t, url: u, type: s ? 'short' : 'video', author: auth.currentUser.displayName, uid: auth.currentUser.uid });
     };
 
     window.moveTrash = (id, data) => {
@@ -117,49 +131,40 @@
         remove(ref(db, `videos/${id}`));
     };
 
-    window.restoreVid = (id, data) => {
-        update(ref(db, `videos/${id}`), data);
-        remove(ref(db, `trash/${id}`));
-    };
-
-    onValue(ref(db, 'videos'), (s) => {
-        const feed = document.getElementById('videoFeed');
-        const sFeed = document.getElementById('shortsFeed');
-        feed.innerHTML = ''; sFeed.innerHTML = '';
-        s.forEach(child => {
+    onValue(ref(db, 'videos'), (snapshot) => {
+        const feeds = { home: '', shorts: '', my: '' };
+        snapshot.forEach(child => {
             const v = child.val();
-            const id = v.url.includes('v=') ? v.url.split('v=')[1] : v.url.split('/').pop();
-            const isAdmin = auth.currentUser?.uid === ADMIN_UID;
-            const html = `<div class="video-card">
-                <div class="video-container"><iframe src="https://www.youtube.com/embed/${id}"></iframe></div>
+            const vidId = v.url.includes('v=') ? v.url.split('v=')[1] : v.url.split('/').pop();
+            
+            // ЛОГИКА УДАЛЕНИЯ: если ты админ ИЛИ это твоё видео
+            const canDelete = (auth.currentUser?.uid === ADMIN_UID || auth.currentUser?.uid === v.uid);
+            
+            const card = `<div class="video-card">
+                <iframe src="https://www.youtube.com/embed/${vidId}"></iframe>
                 <div style="padding:10px"><b>${v.title}</b><br>
-                ${isAdmin ? `<button class="btn btn-red" onclick='moveTrash("${child.key}", ${JSON.stringify(v)})'>Удалить</button>` : ''}
+                ${canDelete ? `<button class="btn btn-red" onclick='moveTrash("${child.key}", ${JSON.stringify(v)})'>Удалить</button>` : ''}
                 </div></div>`;
-            if (v.type === 'short') sFeed.innerHTML += html; else feed.innerHTML += html;
+
+            if (v.type === 'short') feeds.shorts += card; else feeds.home += card;
+            if (v.uid === auth.currentUser?.uid) feeds.my += card;
         });
+        document.getElementById('videoFeed').innerHTML = feeds.home;
+        document.getElementById('shortsFeed').innerHTML = feeds.shorts;
+        document.getElementById('myVideosFeed').innerHTML = feeds.my;
     });
 
-    onValue(ref(db, 'trash'), (s) => {
-        const tFeed = document.getElementById('deletedFeed');
-        tFeed.innerHTML = '';
-        s.forEach(child => {
-            const v = child.val();
-            tFeed.innerHTML += `<div class="video-card"><div style="padding:10px"><b>${v.title}</b><br>
-                <button class="btn btn-green" onclick='restoreVid("${child.key}", ${JSON.stringify(v)})'>Восстановить</button>
-            </div></div>`;
-        });
-    });
-
-    onValue(ref(db, 'users'), (s) => {
-        const uList = document.getElementById('userList');
-        uList.innerHTML = '';
-        s.forEach(child => {
-            const u = child.val();
-            if(u.uid === ADMIN_UID) return;
-            uList.innerHTML += `<div class="user-row"><span>${u.name}</span>
-                <button class="btn btn-red" onclick="update(ref(db, 'users/${u.uid}'), {isBanned: true})">Бан</button>
+    onValue(ref(db, 'users'), (snapshot) => {
+        let html = '';
+        snapshot.forEach(child => {
+            const u = child.val(); if(u.uid === ADMIN_UID) return;
+            html += `<div style="padding:10px; border-bottom:1px solid #222;">
+                ${u.name} ${u.isBanned ? '<b style="color:red">[БАН]</b>' : ''}
+                <button class="btn btn-red" style="width:100px" onclick="update(ref(db, 'users/${u.uid}'), {isBanned: true})">Бан</button>
+                <button class="btn btn-green" style="width:100px" onclick="update(ref(db, 'users/${u.uid}'), {isBanned: false})">Разбан</button>
             </div>`;
         });
+        document.getElementById('userList').innerHTML = html;
     });
 </script>
 </body>
