@@ -3,193 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AxisSite | Shorts & Users Return</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>AxisCompany inc</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --accent: #10a37f; --bg: #0b0d0e; --card: #171717; }
-        body { background: var(--bg); color: #ececf1; font-family: 'Inter', sans-serif; margin: 0; display: flex; height: 100vh; overflow: hidden; }
-        
-        /* Sidebar */
-        .sidebar { width: 260px; background: #000; border-right: 1px solid #333; padding: 20px; display: flex; flex-direction: column; flex-shrink: 0; }
-        .nav-item { padding: 12px; margin: 4px 0; border-radius: 10px; cursor: pointer; color: #888; display: flex; align-items: center; transition: 0.2s; }
-        .nav-item.active { background: #212121; color: var(--accent); border: 1px solid #333; font-weight: 600; }
+        :root {
+            --bg: #ffffff;
+            --text: #000000;
+            --accent-grad: linear-gradient(90deg, #000000, #666666, #000000);
+            --sidebar-bg: #f9f9f9;
+            --border: #e5e5e5;
+        }
 
-        main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
-        .top-bar { padding: 15px 25px; background: rgba(11, 13, 14, 0.9); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #222; }
-        #searchInp { width: 100%; max-width: 600px; padding: 12px; background: #1a1a1a; border: 1px solid #333; color: #fff; border-radius: 12px; outline: none; }
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            height: 100vh;
+            background-color: var(--bg);
+            color: var(--text);
+        }
 
-        .content-section { display: none; padding: 25px; }
-        .content-section.active { display: block; }
+        /* Левое меню (Сайдбар) */
+        .sidebar {
+            width: 280px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            box-sizing: border-box;
+        }
 
-        /* Видео сетки */
-        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-        .shorts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
-        .v-card { background: var(--card); border-radius: 15px; border: 1px solid #333; overflow: hidden; }
-        iframe { width: 100%; aspect-ratio: 16/9; border: none; display: block; }
-        .shorts-iframe { aspect-ratio: 9/16; } /* Пропорции для шортсов */
+        .brand {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
 
-        /* Профиль */
-        .header-container { width: 100%; position: relative; margin-bottom: 40px; }
-        .banner { width: 100%; height: 180px; border-radius: 20px; object-fit: cover; background: #222; border: 1px solid #333; }
-        .profile-bar { display: flex; align-items: center; gap: 20px; padding: 0 30px; margin-top: -50px; }
-        .avatar { width: 100px; height: 100px; border-radius: 50%; border: 6px solid var(--bg); background: var(--accent); overflow: hidden; }
-        .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .menu-label {
+            font-size: 0.9rem;
+            color: #888;
+            margin-bottom: 32px;
+        }
 
-        /* Поиск людей */
-        .user-search-box { background: #111; padding: 20px; border-radius: 15px; border: 1px solid #333; margin-bottom: 30px; }
-        .user-result { display: flex; align-items: center; gap: 15px; padding: 10px; border-bottom: 1px solid #222; }
-        .user-mini-ava { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+        .tabs-header {
+            font-weight: 600;
+            text-transform: lowercase;
+            margin-bottom: 16px;
+            font-size: 1.2rem;
+        }
 
-        .btn-action { background: #222; border: 1px solid #333; color: #fff; padding: 8px 15px; border-radius: 8px; cursor: pointer; }
-        .btn-sub { background: var(--accent); border: none; font-weight: 600; }
-        input[type="text"] { width: 100%; padding: 10px; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; box-sizing: border-box; }
+        .nav-item {
+            padding: 10px 0;
+            cursor: pointer;
+            font-size: 1rem;
+            color: #333;
+            transition: color 0.2s;
+            text-decoration: none;
+            display: block;
+        }
+
+        .nav-item:hover {
+            color: #000;
+            font-weight: 600;
+        }
+
+        .under-dev {
+            font-size: 0.8rem;
+            color: #999;
+            display: block;
+            margin-top: 4px;
+        }
+
+        /* Основной контент */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .main-header {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            font-weight: 400;
+        }
+
+        .sub-header {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 60px;
+        }
+
+        /* Тот самый градиент из наброска */
+        .gradient-title {
+            font-size: 6rem;
+            font-weight: 800;
+            line-height: 1.1;
+            background: var(--accent-grad);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: moveGrad 5s linear infinite;
+        }
+
+        @keyframes moveGrad {
+            to { background-position: 200% center; }
+        }
+
+        @media (max-width: 768px) {
+            .gradient-title { font-size: 3rem; }
+            .sidebar { width: 200px; }
+        }
     </style>
 </head>
 <body>
 
-<div class="sidebar">
-    <div style="font-weight:bold; font-size:1.5rem; margin-bottom:30px; color:var(--accent)">AxisSite</div>
-    <div class="nav-item active" onclick="showPage('home', this)">📺 Лента</div>
-    <div class="nav-item" onclick="showPage('shorts-page', this)">📱 Shorts</div>
-    <div class="nav-item" id="nav-chan" onclick="showPage('my-channel', this)">👤 Мой канал</div>
-    <div class="nav-item" onclick="showPage('studio', this)">🎨 Загрузить</div>
-</div>
+    <aside class="sidebar">
+        <div class="brand">AxisCompany inc</div>
+        <div class="menu-label">Меню</div>
 
-<main>
-    <div class="top-bar">
-        <input type="text" id="searchInp" placeholder="Поиск видео..." oninput="renderApp()">
-    </div>
+        <div class="tabs-header">вкладки</div>
+        <nav>
+            <a href="#" class="nav-item">Настройки</a>
+            <a href="#" class="nav-item">Аккаунт</a>
+            <a href="#" class="nav-item">Новости</a>
+            <a href="#" class="nav-item">
+                AxisAI 
+                <span class="under-dev">(Under development)</span>
+            </a>
+        </nav>
+    </aside>
 
-    <section id="home" class="content-section active">
-        <h2>Рекомендации</h2>
-        <div class="video-grid" id="mainFeed"></div>
-    </section>
-
-    <section id="shorts-page" class="content-section">
-        <h2>Короткие Shorts</h2>
-        <div class="shorts-grid" id="shortsFeed"></div>
-    </section>
-
-    <section id="my-channel" class="content-section">
-        <div class="header-container">
-            <img id="uBanner" src="https://images.unsplash.com/photo-1614850523296-d8c1af93d400?q=80" class="banner">
-            <div class="profile-bar">
-                <div class="avatar" id="uAva"></div>
-                <div><h1 id="uName" style="margin:0">Загрузка...</h1></div>
-            </div>
+    <main>
+        <div class="main-header">Главное меню</div>
+        <div class="sub-header">AxisCompany inc</div>
+        
+        <div class="gradient-title">
+            Градиент в<br>меню
         </div>
+    </main>
 
-        <div class="user-search-box">
-            <h3>Найти пользователей</h3>
-            <input type="text" id="userSearchInp" placeholder="Введите имя..." oninput="searchUsers()">
-            <div id="userResults"></div>
-        </div>
-
-        <h3>Ваши видео</h3>
-        <div class="video-grid" id="myFeed"></div>
-    </section>
-
-    <section id="studio" class="content-section">
-        <div style="background:#111; padding:25px; border-radius:15px; max-width:450px;">
-            <h3>Студия</h3>
-            <input type="text" id="vTitle" placeholder="Название"><br><br>
-            <input type="text" id="vUrl" placeholder="ID YouTube"><br><br>
-            <label><input type="checkbox" id="isShort"> Это вертикальный Shorts</label><br><br>
-            <button class="btn-action btn-sub" style="width:100%" onclick="postVideo()">Опубликовать</button>
-        </div>
-    </section>
-</main>
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getDatabase, ref, onValue, push, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyDw6J2bx2-K86qeP_fPVbpwE30iZIAU-Gk",
-        authDomain: "axistube-31fee.firebaseapp.com",
-        databaseURL: "https://axistube-31fee-default-rtdb.firebaseio.com",
-        projectId: "axistube-31fee",
-        appId: "1:261441549369:web:6ee655221cc0078377c9e8"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
-
-    let vids = [], allUsers = [];
-
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            update(ref(db, `users/${user.uid}`), { name: user.displayName });
-            onValue(ref(db, `users/${user.uid}`), (s) => {
-                const d = s.val();
-                document.getElementById('uName').innerText = d?.name || user.displayName;
-                if(d?.avatar) document.getElementById('uAva').innerHTML = `<img src="${d.avatar}">`;
-                if(d?.banner) document.getElementById('uBanner').src = d.banner;
-            });
-            onValue(ref(db, 'users'), (snap) => {
-                allUsers = []; snap.forEach(u => allUsers.push({id: u.key, ...u.val()}));
-            });
-        } else { signInWithPopup(auth, new GoogleAuthProvider()); }
-    });
-
-    window.showPage = (id, el) => {
-        document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        el.classList.add('active');
-    };
-
-    window.postVideo = () => {
-        const t = document.getElementById('vTitle').value, u = document.getElementById('vUrl').value, s = document.getElementById('isShort').checked;
-        if(t && u) push(ref(db, 'videos'), { title: t, url: u, type: s ? 'short' : 'video', author: auth.currentUser.displayName, uid: auth.currentUser.uid });
-    };
-
-    window.searchUsers = () => {
-        const q = document.getElementById('userSearchInp').value.toLowerCase();
-        const res = document.getElementById('userResults');
-        res.innerHTML = '';
-        if(q.length < 2) return;
-        allUsers.forEach(u => {
-            if(u.name.toLowerCase().includes(q)) {
-                res.innerHTML += `<div class="user-result">
-                    <img src="${u.avatar || 'https://via.placeholder.com/40'}" class="user-mini-ava">
-                    <span style="flex:1"><b>${u.name}</b></span>
-                    <button class="btn-action" onclick="goToUser('${u.name}')">Канал</button>
-                </div>`;
-            }
-        });
-    };
-
-    window.goToUser = (name) => {
-        document.getElementById('searchInp').value = name;
-        renderApp();
-        showPage('home', document.querySelector('.nav-item'));
-    };
-
-    window.renderApp = () => {
-        const q = document.getElementById('searchInp').value.toLowerCase();
-        let h = '', s = '', m = '';
-        vids.forEach(v => {
-            if(v.val.title.toLowerCase().includes(q) || v.val.author.toLowerCase().includes(q)) {
-                const card = `<div class="v-card">
-                    <iframe class="${v.val.type === 'short' ? 'shorts-iframe' : ''}" src="https://www.youtube.com/embed/${v.val.url}"></iframe>
-                    <div style="padding:10px"><b>${v.val.title}</b><br><small>@${v.val.author}</small></div>
-                </div>`;
-                if(v.val.type === 'short') s += card; else h += card;
-                if(v.val.uid === auth.currentUser?.uid) m += card;
-            }
-        });
-        document.getElementById('mainFeed').innerHTML = h;
-        document.getElementById('shortsFeed').innerHTML = s;
-        document.getElementById('myFeed').innerHTML = m;
-    };
-
-    onValue(ref(db, 'videos'), (snap) => {
-        vids = []; snap.forEach(c => vids.push({key: c.key, val: c.val()}));
-        renderApp();
-    });
-</script>
 </body>
 </html>
