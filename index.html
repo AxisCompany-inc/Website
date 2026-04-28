@@ -3,8 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AxisCompany inc | Auth System</title>
+    <title>AxisCompany inc | System</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        // Логика для работы с доменом DuckDNS
+        if (window.location.hostname === "axisgameinc.github.io") {
+            console.log("Основной хост подтвержден. Подключение к DuckDNS активно.");
+            // Здесь можно добавить: window.location.href = "http://твой-адрес.duckdns.org";
+        }
+    </script>
+
     <style>
         :root {
             --bg: #ffffff;
@@ -34,7 +43,7 @@
             overflow: hidden;
         }
 
-        /* Окно регистрации/входа */
+        /* Окно регистрации */
         #auth-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -116,12 +125,20 @@
             width: 100%;
         }
 
+        .status-badge {
+            background: var(--accent);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body id="body">
 
-    <!-- Слой регистрации -->
+    <!-- Auth Layer -->
     <div id="auth-overlay">
         <div class="auth-card">
             <h2 style="margin-top:0">Axis Auth</h2>
@@ -134,11 +151,12 @@
 
     <aside class="sidebar">
         <div style="font-weight:700;">AxisCompany inc</div>
-        <div style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:40px;">Меню</div>
+        <div style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:40px;">System v12.5</div>
 
         <div style="font-weight:700; font-size:1.2rem; margin-bottom:20px;">вкладки</div>
         <nav>
             <button class="nav-item active" onclick="openTab(event, 'home')">Главная</button>
+            <button class="nav-item" onclick="openTab(event, 'server')">🎮 Мой Сервер</button>
             <button class="nav-item" onclick="openTab(event, 'settings')">Настройки</button>
             <button class="nav-item" onclick="openTab(event, 'account')">Аккаунт</button>
             <button class="nav-item" onclick="openTab(event, 'news')">Новости</button>
@@ -147,14 +165,32 @@
     </aside>
 
     <main>
+        <!-- Home -->
         <section id="home" class="content-section active">
             <h1>Главная</h1>
             <div class="card">
                 <h3>Привет, <span id="welcomeName">пользователь</span>!</h3>
-                <p>Все системы Axis работают в штатном режиме.</p>
+                <p>Добро пожаловать в панель управления. Все сервисы DuckDNS синхронизированы.</p>
             </div>
         </section>
 
+        <!-- Minecraft Server Tab -->
+        <section id="server" class="content-section">
+            <h1>Управление сервером</h1>
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3>Minecraft Server</h3>
+                    <span class="status-badge">Online</span>
+                </div>
+                <p style="font-family: monospace; background: #eee; padding: 10px; border-radius: 5px; color: #000;">
+                    IP: axisgameinc.duckdns.org
+                </p>
+                <p>Владелец: <b id="serverOwner">---</b></p>
+                <button class="btn" style="background: #10a37f; color: white;" onclick="alert('Команда отправлена на сервер!')">Перезагрузить</button>
+            </div>
+        </section>
+
+        <!-- Settings -->
         <section id="settings" class="content-section">
             <h1>Настройки</h1>
             <div class="card">
@@ -165,37 +201,39 @@
             </div>
         </section>
 
+        <!-- Account -->
         <section id="account" class="content-section">
             <h1>Мой Аккаунт</h1>
             <div class="card">
                 <p><b>Имя:</b> <span id="profileName">---</span></p>
                 <p><b>Email:</b> <span id="profileEmail">---</span></p>
-                <p><b>Статус:</b> <span style="color: var(--accent);">Premium User</span></p>
+                <p><b>Домен:</b> <span style="color: var(--accent);">duckdns.org</span></p>
             </div>
             <button class="btn" onclick="logout()" style="background: #ff4444; color: white;">Выйти из аккаунта</button>
         </section>
 
+        <!-- News -->
         <section id="news" class="content-section">
             <h1>Новости</h1>
             <div class="card">
                 <small style="color: var(--accent);">28.04.2026</small>
-                <h3>Регистрация запущена</h3>
-                <p>Теперь каждый участник AxisCompany имеет свой уникальный профиль.</p>
+                <h3>Интеграция DuckDNS</h3>
+                <p>Добавлена поддержка динамических IP и вкладка мониторинга сервера.</p>
             </div>
         </section>
 
+        <!-- AxisAI -->
         <section id="axis-ai" class="content-section">
             <h1>AxisAI</h1>
             <div class="card" style="background: #000; color: #0f0; font-family: monospace;">
-                > Accessing database...<br>
-                > User identified: <span id="aiUser">---</span><br>
-                > Phase: Development
+                > Accessing DuckDNS nodes...<br>
+                > User: <span id="aiUser">---</span><br>
+                > Status: Listening...
             </div>
         </section>
     </main>
 
     <script>
-        // Проверка: залогинен ли уже пользователь?
         window.onload = () => {
             const savedName = localStorage.getItem('axis_user');
             if (savedName) {
@@ -207,17 +245,12 @@
         function handleAuth() {
             const name = document.getElementById('regName').value;
             const email = document.getElementById('regEmail').value;
-
             if (name && email) {
                 localStorage.setItem('axis_user', name);
                 localStorage.setItem('axis_email', email);
                 applyUserData(name, email);
-                
-                // Эффект закрытия окна
                 document.getElementById('auth-overlay').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('auth-overlay').style.display = 'none';
-                }, 300);
+                setTimeout(() => { document.getElementById('auth-overlay').style.display = 'none'; }, 300);
             } else {
                 alert("Заполните все поля!");
             }
@@ -228,6 +261,7 @@
             document.getElementById('profileName').innerText = name;
             document.getElementById('profileEmail').innerText = email;
             document.getElementById('aiUser').innerText = name;
+            document.getElementById('serverOwner').innerText = name;
         }
 
         function logout() {
@@ -238,10 +272,8 @@
         function openTab(evt, tabName) {
             const sections = document.getElementsByClassName("content-section");
             for (let i = 0; i < sections.length; i++) sections[i].classList.remove("active");
-            
             const navItems = document.getElementsByClassName("nav-item");
             for (let i = 0; i < navItems.length; i++) navItems[i].classList.remove("active");
-            
             document.getElementById(tabName).classList.add("active");
             evt.currentTarget.classList.add("active");
         }
