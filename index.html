@@ -3,92 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Axis Site | Admin Edition</title>
+    <title>Axis Studio | Justice Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        :root { --accent: #10a37f; --bg: #0b0d0e; --card: #171717; --glass: rgba(255, 255, 255, 0.05); --accent-bg: var(--accent); }
-        .theme-pink { --accent: #ff69b4; }
-        .gradient-on { --accent-bg: linear-gradient(135deg, var(--accent) 0%, #6a11cb 100%); }
-        .theme-pink.gradient-on { --accent-bg: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%); }
-
-        * { box-sizing: border-box; transition: all 0.3s ease; }
-        body { background: var(--bg); color: #ececf1; font-family: 'Inter', sans-serif; margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        :root { --oa-green: #10a37f; --oa-bg: #0b0d0e; --card: #171717; }
+        body { background: var(--oa-bg); color: #ececf1; font-family: 'Inter', sans-serif; margin: 0; display: flex; height: 100vh; }
         
-        .sidebar { width: 260px; background: #000; border-right: 1px solid #2d2d2d; display: flex; flex-direction: column; padding: 20px; }
-        .logo { font-weight: 600; color: var(--accent); margin-bottom: 40px; font-size: 1.3rem; }
-        .nav-item { padding: 12px 15px; margin: 4px 0; border-radius: 12px; cursor: pointer; display: flex; align-items: center; font-size: 0.95rem; color: #8e8ea0; }
-        .nav-item.active { background: var(--accent-bg); color: white; }
-        .admin-only { display: none; border: 1px dashed var(--accent); margin-top: 20px; }
+        .sidebar { width: 260px; background: #000; border-right: 1px solid #333; padding: 20px; display: flex; flex-direction: column; }
+        .nav-item { padding: 12px; margin: 4px 0; border-radius: 10px; cursor: pointer; color: #888; display: flex; align-items: center; }
+        .nav-item.active { background: #212121; color: #fff; border: 1px solid #444; }
+        #adminTab { border: 1px dashed gold; color: gold; margin-top: 20px; display: none; }
 
-        main { flex: 1; overflow-y: auto; }
-        .page { display: none; max-width: 1100px; margin: 0 auto; padding: 20px; animation: fadeIn 0.3s ease; }
-        .page.active { display: block; }
+        main { flex: 1; overflow-y: auto; padding: 25px; }
+        .content-section { display: none; animation: fadeIn 0.3s; }
+        .content-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .card { background: var(--card); border-radius: 15px; padding: 20px; border: 1px solid #333; margin-bottom: 20px; }
-        .btn { background: var(--accent-bg); color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: 600; }
-        .btn-danger { background: #ff4444; margin-top: 5px; font-size: 0.8rem; width: 100%; }
-
-        /* Video Grid */
-        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
-        .v-item { background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid #333; position: relative; }
+        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .video-card { background: var(--card); border-radius: 15px; border: 1px solid #333; overflow: hidden; }
         iframe { width: 100%; aspect-ratio: 16/9; border: none; }
 
-        /* Admin Table */
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #333; }
-        .ban-status { color: #ff4444; font-weight: bold; }
+        .admin-panel { background: #111; border: 1px solid gold; padding: 20px; border-radius: 15px; }
+        .strike-badge { background: red; color: white; padding: 2px 8px; border-radius: 5px; font-size: 12px; }
+        .btn { padding: 8px 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; margin: 5px; }
+        .btn-strike { background: #ff9800; color: black; }
+        .btn-restore { background: #4caf50; color: white; }
+        .btn-ban { background: #f44336; color: white; }
     </style>
 </head>
-<body class="theme-green">
+<body>
 
 <div class="sidebar">
-    <div class="logo">AXIS ADMIN</div>
+    <div style="color: var(--oa-green); font-weight: bold; margin-bottom: 30px;">AXIS PROJECT</div>
     <div class="nav-item active" onclick="showPage('home', this)">📺 Лента</div>
+    <div class="nav-item" onclick="showPage('shorts-page', this)">📱 Shorts</div>
     <div class="nav-item" onclick="showPage('studio', this)">🎨 Загрузить</div>
-    <div class="nav-item" onclick="showPage('profile', this)">⚙️ Мой Канал</div>
-    <div class="nav-item admin-only" id="adminTab" onclick="showPage('admin', this)">🛡️ Модерация</div>
+    <div class="nav-item" id="adminTab" onclick="showPage('admin-page', this)">🛡️ Модерация</div>
 </div>
 
 <main>
-    <section id="page-home" class="page active">
-        <h2>Общая лента</h2>
-        <div class="video-grid" id="mainFeed"></div>
+    <section id="home" class="content-section active">
+        <h2>Актуальное</h2>
+        <div class="video-grid" id="videoFeed"></div>
     </section>
 
-    <section id="page-studio" class="page">
-        <h2>Добавить видео</h2>
-        <div class="card">
-            <input type="text" id="vTitle" placeholder="Название..." style="width:100%; padding:10px; margin-bottom:10px; background:#000; color:#fff; border:1px solid #444; border-radius:8px;">
-            <input type="text" id="vUrl" placeholder="Ссылка на YouTube..." style="width:100%; padding:10px; margin-bottom:10px; background:#000; color:#fff; border:1px solid #444; border-radius:8px;">
-            <button class="btn" onclick="postVideo()">Опубликовать</button>
-        </div>
+    <section id="shorts-page" class="content-section">
+        <h2>Shorts</h2>
+        <div class="video-grid" id="shortsFeed" style="grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));"></div>
     </section>
 
-    <section id="page-profile" class="page">
-        <div class="card">
-            <h2 id="uNameDisplay">Профиль</h2>
-            <p>Тут настройки твоего канала (баннеры и аватарки из v6.0 работают).</p>
-        </div>
-    </section>
+    <section id="admin-page" class="content-section">
+        <div class="admin-panel">
+            <h2>Панель Батьки</h2>
+            
+            <h3>Пользователи и Страйки</h3>
+            <div id="adminUsers"></div>
 
-    <section id="page-admin" class="page">
-        <h2>Управление пользователями</h2>
-        <div class="card">
-            <table>
-                <thead>
-                    <tr><th>Имя</th><th>UID</th><th>Статус</th><th>Действие</th></tr>
-                </thead>
-                <tbody id="userList"></tbody>
-            </table>
+            <h3 style="margin-top:40px;">Удалённые видео (Корзина)</h3>
+            <div id="deletedVideos" class="video-grid"></div>
         </div>
     </section>
 </main>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getDatabase, ref, push, onValue, set, remove, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getDatabase, ref, onValue, update, push, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyDw6J2bx2-K86qeP_fPVbpwE30iZIAU-Gk",
@@ -101,103 +81,105 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getDatabase(app);
-    const provider = new GoogleAuthProvider();
-
-    // ВСТАВЬ СВОЙ UID СЮДА!
-    const ADMIN_UID = "H9JYbowxIXOdQ7Ef3atMDNXXmxf1"; 
+    const BOSS_UID = "H9JYbowxIXOdQ7Ef3atMDNXXmxf1"; // Твой UID
 
     window.showPage = (id, el) => {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-        document.getElementById('page-'+id).classList.add('active');
+        document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
         el.classList.add('active');
     };
 
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            // Проверка на бан
-            onValue(ref(db, `users/${user.uid}/banned`), (s) => {
-                if(s.val() === true) {
-                    alert("ВЫ ЗАБАНЕНЫ!");
-                    signOut(auth);
+            if (user.uid === BOSS_UID) document.getElementById('adminTab').style.display = 'flex';
+            
+            // Авто-бан при 3 страйках
+            onValue(ref(db, `users/${user.uid}`), (s) => {
+                const data = s.val();
+                if (data?.strikes >= 3 || data?.isBanned) {
+                    alert("Допрыгался! Твой аккаунт заблокирован.");
+                    auth.signOut();
                     location.reload();
                 }
             });
-
-            // Показываем админку если это ТЫ
-            if(user.uid === ADMIN_UID) {
-                document.getElementById('adminTab').style.display = 'flex';
-                loadUsersForAdmin();
-            }
-
-            document.getElementById('uNameDisplay').innerText = user.displayName;
-            // Регистрация пользователя в базе для списка админа
-            update(ref(db, `users/${user.uid}`), { name: user.displayName, email: user.email });
+            update(ref(db, `users/${user.uid}`), { name: user.displayName, uid: user.uid });
         } else {
-            signInWithPopup(auth, provider);
+            signInWithPopup(auth, new GoogleAuthProvider());
         }
     });
 
-    window.postVideo = () => {
-        const title = document.getElementById('vTitle').value, url = document.getElementById('vUrl').value;
-        if(title && url) push(ref(db, 'content'), { title, url, author: auth.currentUser.displayName, uid: auth.currentUser.uid });
-    };
-
-    // Функция удаления для админа
-    window.deleteVideo = (id) => {
-        if(confirm("Удалить это видео навсегда?")) {
-            remove(ref(db, `content/${id}`));
+    // --- МОДЕРАЦИЯ ВИДЕО ---
+    window.softDelete = (id, data) => {
+        if(confirm("Удалить в корзину?")) {
+            update(ref(db, `deleted_content/${id}`), data); // Переносим в корзину
+            remove(ref(db, `videos/${id}`)); // Удаляем из основной ленты
         }
     };
 
-    // Функции админки
-    window.toggleBan = (uid, currentStatus) => {
-        update(ref(db, `users/${uid}`), { banned: !currentStatus });
+    window.restoreVideo = (id, data) => {
+        update(ref(db, `videos/${id}`), data);
+        remove(ref(db, `deleted_content/${id}`));
     };
 
-    function loadUsersForAdmin() {
-        onValue(ref(db, 'users'), (snap) => {
-            const list = document.getElementById('userList');
-            list.innerHTML = '';
-            snap.forEach(child => {
-                const u = child.val();
-                const uid = child.key;
-                list.innerHTML += `
-                    <tr>
-                        <td>${u.name}</td>
-                        <td style="font-size:10px">${uid}</td>
-                        <td class="${u.banned ? 'ban-status' : ''}">${u.banned ? 'BANNED' : 'Active'}</td>
-                        <td>
-                            <button class="btn" onclick="toggleBan('${uid}', ${u.banned || false})">${u.banned ? 'Unban' : 'Ban'}</button>
-                        </td>
-                    </tr>`;
-            });
-        });
-    }
+    // --- СИСТЕМА СТРАЙКОВ ---
+    window.addStrike = (uid, currentStrikes = 0) => {
+        update(ref(db, `users/${uid}`), { strikes: currentStrikes + 1 });
+    };
 
-    // Рендер видео с кнопкой удаления
-    onValue(ref(db, 'content'), (snap) => {
-        const feed = document.getElementById('mainFeed');
+    window.removeBan = (uid) => {
+        update(ref(db, `users/${uid}`), { strikes: 0, isBanned: false });
+        alert("Пользователь помилован!");
+    };
+
+    // --- РЕНДЕРИНГ ---
+    onValue(ref(db, 'videos'), (s) => {
+        const feed = document.getElementById('videoFeed');
         feed.innerHTML = '';
-        snap.forEach(child => {
+        s.forEach(child => {
             const v = child.val();
-            const vidId = v.url.includes('youtu.be') ? v.url.split('/').pop() : new URLSearchParams(new URL(v.url).search).get('v');
-            
-            let deleteBtn = '';
-            if(auth.currentUser && auth.currentUser.uid === ADMIN_UID) {
-                deleteBtn = `<button class="btn btn-danger" onclick="deleteVideo('${child.key}')">УДАЛИТЬ ВИДЕО</button>`;
-            }
-
+            const isAdmin = auth.currentUser?.uid === BOSS_UID;
             feed.innerHTML += `
-                <div class="v-item">
-                    <iframe src="https://www.youtube.com/embed/${vidId}"></iframe>
+                <div class="video-card">
+                    <iframe src="https://www.youtube.com/embed/${v.url.split('v=')[1]}"></iframe>
                     <div style="padding:10px">
-                        <b>${v.title}</b><br><small>${v.author}</small>
-                        ${deleteBtn}
+                        <b>${v.title}</b><br>
+                        ${isAdmin ? `<button class="btn btn-ban" onclick='softDelete("${child.key}", ${JSON.stringify(v)})'>Удалить</button>` : ''}
                     </div>
                 </div>`;
         });
     });
+
+    onValue(ref(db, 'deleted_content'), (s) => {
+        const delFeed = document.getElementById('deletedVideos');
+        delFeed.innerHTML = '';
+        s.forEach(child => {
+            const v = child.val();
+            delFeed.innerHTML += `
+                <div class="video-card">
+                    <div style="padding:10px">
+                        <b>${v.title}</b><br>
+                        <button class="btn btn-restore" onclick='restoreVideo("${child.key}", ${JSON.stringify(v)})'>ВЕРНУТЬ ВИДЕО</button>
+                    </div>
+                </div>`;
+        });
+    });
+
+    onValue(ref(db, 'users'), (s) => {
+        const adminUsers = document.getElementById('adminUsers');
+        adminUsers.innerHTML = '';
+        s.forEach(child => {
+            const u = child.val();
+            if(u.uid === BOSS_UID) return;
+            adminUsers.innerHTML += `
+                <div style="padding:10px; border-bottom:1px solid #222;">
+                    ${u.name} <span class="strike-badge">Страйки: ${u.strikes || 0}</span>
+                    <button class="btn btn-strike" onclick="addStrike('${u.uid}', ${u.strikes || 0})">+1 Страйк</button>
+                    <button class="btn btn-restore" onclick="removeBan('${u.uid}')">Разбанить / Обнулить</button>
+                </div>`;
+        });
+    });
+
 </script>
 </body>
 </html>
