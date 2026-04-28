@@ -3,32 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Axis Studio | Justice Edition</title>
+    <title>Axis Project | Platform</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root { --oa-green: #10a37f; --oa-bg: #0b0d0e; --card: #171717; }
         body { background: var(--oa-bg); color: #ececf1; font-family: 'Inter', sans-serif; margin: 0; display: flex; height: 100vh; }
         
         .sidebar { width: 260px; background: #000; border-right: 1px solid #333; padding: 20px; display: flex; flex-direction: column; }
-        .nav-item { padding: 12px; margin: 4px 0; border-radius: 10px; cursor: pointer; color: #888; display: flex; align-items: center; }
+        .nav-item { padding: 12px; margin: 4px 0; border-radius: 10px; cursor: pointer; color: #888; display: flex; align-items: center; text-decoration: none; }
         .nav-item.active { background: #212121; color: #fff; border: 1px solid #444; }
-        #adminTab { border: 1px dashed gold; color: gold; margin-top: 20px; display: none; }
+        #modTab { border: 1px dashed var(--oa-green); margin-top: 20px; display: none; }
 
         main { flex: 1; overflow-y: auto; padding: 25px; }
-        .content-section { display: none; animation: fadeIn 0.3s; }
+        .content-section { display: none; }
         .content-section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
         .video-card { background: var(--card); border-radius: 15px; border: 1px solid #333; overflow: hidden; }
-        iframe { width: 100%; aspect-ratio: 16/9; border: none; }
+        .video-container { position: relative; width: 100%; aspect-ratio: 16/9; }
+        iframe { width: 100%; height: 100%; border: none; }
 
-        .admin-panel { background: #111; border: 1px solid gold; padding: 20px; border-radius: 15px; }
-        .strike-badge { background: red; color: white; padding: 2px 8px; border-radius: 5px; font-size: 12px; }
-        .btn { padding: 8px 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; margin: 5px; }
-        .btn-strike { background: #ff9800; color: black; }
-        .btn-restore { background: #4caf50; color: white; }
-        .btn-ban { background: #f44336; color: white; }
+        .btn { padding: 8px 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; margin: 5px; color: white; }
+        .btn-red { background: #ff4444; }
+        .btn-green { background: var(--oa-green); }
+        .user-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #333; }
     </style>
 </head>
 <body>
@@ -38,7 +36,7 @@
     <div class="nav-item active" onclick="showPage('home', this)">📺 Лента</div>
     <div class="nav-item" onclick="showPage('shorts-page', this)">📱 Shorts</div>
     <div class="nav-item" onclick="showPage('studio', this)">🎨 Загрузить</div>
-    <div class="nav-item" id="adminTab" onclick="showPage('admin-page', this)">🛡️ Модерация</div>
+    <div class="nav-item" id="modTab" onclick="showPage('mod-page', this)">🛡️ Модерация</div>
 </div>
 
 <main>
@@ -52,15 +50,23 @@
         <div class="video-grid" id="shortsFeed" style="grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));"></div>
     </section>
 
-    <section id="admin-page" class="content-section">
-        <div class="admin-panel">
-            <h2>Панель Батьки</h2>
-            
-            <h3>Пользователи и Страйки</h3>
-            <div id="adminUsers"></div>
+    <section id="studio" class="content-section">
+        <h2>Загрузить видео</h2>
+        <div style="background: #111; padding: 20px; border-radius: 15px;">
+            <input type="text" id="vTitle" placeholder="Название..." style="width: 100%; padding: 10px; margin-bottom: 10px; background: #000; color: #fff; border: 1px solid #333;">
+            <input type="text" id="vUrl" placeholder="Ссылка на YouTube..." style="width: 100%; padding: 10px; margin-bottom: 10px; background: #000; color: #fff; border: 1px solid #333;">
+            <label><input type="checkbox" id="isShort"> Это вертикальное видео (Shorts)</label><br><br>
+            <button class="btn btn-green" onclick="postVideo()">Опубликовать</button>
+        </div>
+    </section>
 
-            <h3 style="margin-top:40px;">Удалённые видео (Корзина)</h3>
-            <div id="deletedVideos" class="video-grid"></div>
+    <section id="mod-page" class="content-section">
+        <h2>Панель модерации</h2>
+        <div style="background: #111; padding: 20px; border-radius: 15px;">
+            <h3>Пользователи</h3>
+            <div id="userList"></div>
+            <h3 style="margin-top: 30px;">Корзина</h3>
+            <div id="deletedFeed" class="video-grid"></div>
         </div>
     </section>
 </main>
@@ -81,7 +87,7 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getDatabase(app);
-    const BOSS_UID = "H9JYbowxIXOdQ7Ef3atMDNXXmxf1"; // Твой UID
+    const ADMIN_UID = "H9JYbowxIXOdQ7Ef3atMDNXXmxf1";
 
     window.showPage = (id, el) => {
         document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
@@ -92,94 +98,69 @@
 
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            if (user.uid === BOSS_UID) document.getElementById('adminTab').style.display = 'flex';
-            
-            // Авто-бан при 3 страйках
-            onValue(ref(db, `users/${user.uid}`), (s) => {
-                const data = s.val();
-                if (data?.strikes >= 3 || data?.isBanned) {
-                    alert("Допрыгался! Твой аккаунт заблокирован.");
-                    auth.signOut();
-                    location.reload();
-                }
-            });
+            if (user.uid === ADMIN_UID) document.getElementById('modTab').style.display = 'flex';
             update(ref(db, `users/${user.uid}`), { name: user.displayName, uid: user.uid });
         } else {
             signInWithPopup(auth, new GoogleAuthProvider());
         }
     });
 
-    // --- МОДЕРАЦИЯ ВИДЕО ---
-    window.softDelete = (id, data) => {
-        if(confirm("Удалить в корзину?")) {
-            update(ref(db, `deleted_content/${id}`), data); // Переносим в корзину
-            remove(ref(db, `videos/${id}`)); // Удаляем из основной ленты
-        }
+    window.postVideo = () => {
+        const t = document.getElementById('vTitle').value;
+        const u = document.getElementById('vUrl').value;
+        const s = document.getElementById('isShort').checked;
+        if(t && u) push(ref(db, 'videos'), { title: t, url: u, type: s ? 'short' : 'video', author: auth.currentUser.displayName });
     };
 
-    window.restoreVideo = (id, data) => {
+    window.moveTrash = (id, data) => {
+        update(ref(db, `trash/${id}`), data);
+        remove(ref(db, `videos/${id}`));
+    };
+
+    window.restoreVid = (id, data) => {
         update(ref(db, `videos/${id}`), data);
-        remove(ref(db, `deleted_content/${id}`));
+        remove(ref(db, `trash/${id}`));
     };
 
-    // --- СИСТЕМА СТРАЙКОВ ---
-    window.addStrike = (uid, currentStrikes = 0) => {
-        update(ref(db, `users/${uid}`), { strikes: currentStrikes + 1 });
-    };
-
-    window.removeBan = (uid) => {
-        update(ref(db, `users/${uid}`), { strikes: 0, isBanned: false });
-        alert("Пользователь помилован!");
-    };
-
-    // --- РЕНДЕРИНГ ---
     onValue(ref(db, 'videos'), (s) => {
         const feed = document.getElementById('videoFeed');
-        feed.innerHTML = '';
+        const sFeed = document.getElementById('shortsFeed');
+        feed.innerHTML = ''; sFeed.innerHTML = '';
         s.forEach(child => {
             const v = child.val();
-            const isAdmin = auth.currentUser?.uid === BOSS_UID;
-            feed.innerHTML += `
-                <div class="video-card">
-                    <iframe src="https://www.youtube.com/embed/${v.url.split('v=')[1]}"></iframe>
-                    <div style="padding:10px">
-                        <b>${v.title}</b><br>
-                        ${isAdmin ? `<button class="btn btn-ban" onclick='softDelete("${child.key}", ${JSON.stringify(v)})'>Удалить</button>` : ''}
-                    </div>
-                </div>`;
+            const id = v.url.includes('v=') ? v.url.split('v=')[1] : v.url.split('/').pop();
+            const isAdmin = auth.currentUser?.uid === ADMIN_UID;
+            const html = `<div class="video-card">
+                <div class="video-container"><iframe src="https://www.youtube.com/embed/${id}"></iframe></div>
+                <div style="padding:10px"><b>${v.title}</b><br>
+                ${isAdmin ? `<button class="btn btn-red" onclick='moveTrash("${child.key}", ${JSON.stringify(v)})'>Удалить</button>` : ''}
+                </div></div>`;
+            if (v.type === 'short') sFeed.innerHTML += html; else feed.innerHTML += html;
         });
     });
 
-    onValue(ref(db, 'deleted_content'), (s) => {
-        const delFeed = document.getElementById('deletedVideos');
-        delFeed.innerHTML = '';
+    onValue(ref(db, 'trash'), (s) => {
+        const tFeed = document.getElementById('deletedFeed');
+        tFeed.innerHTML = '';
         s.forEach(child => {
             const v = child.val();
-            delFeed.innerHTML += `
-                <div class="video-card">
-                    <div style="padding:10px">
-                        <b>${v.title}</b><br>
-                        <button class="btn btn-restore" onclick='restoreVideo("${child.key}", ${JSON.stringify(v)})'>ВЕРНУТЬ ВИДЕО</button>
-                    </div>
-                </div>`;
+            tFeed.innerHTML += `<div class="video-card"><div style="padding:10px"><b>${v.title}</b><br>
+                <button class="btn btn-green" onclick='restoreVid("${child.key}", ${JSON.stringify(v)})'>Восстановить</button>
+            </div></div>`;
         });
     });
 
     onValue(ref(db, 'users'), (s) => {
-        const adminUsers = document.getElementById('adminUsers');
-        adminUsers.innerHTML = '';
+        const uList = document.getElementById('userList');
+        uList.innerHTML = '';
         s.forEach(child => {
             const u = child.val();
-            if(u.uid === BOSS_UID) return;
-            adminUsers.innerHTML += `
-                <div style="padding:10px; border-bottom:1px solid #222;">
-                    ${u.name} <span class="strike-badge">Страйки: ${u.strikes || 0}</span>
-                    <button class="btn btn-strike" onclick="addStrike('${u.uid}', ${u.strikes || 0})">+1 Страйк</button>
-                    <button class="btn btn-restore" onclick="removeBan('${u.uid}')">Разбанить / Обнулить</button>
-                </div>`;
+            if(u.uid === ADMIN_UID) return;
+            uList.innerHTML += `<div class="user-row"><span>${u.name}</span>
+                <button class="btn btn-red" onclick="update(ref(db, 'users/${u.uid}'), {isBanned: true})">Бан</button>
+            </div>`;
         });
     });
-
 </script>
 </body>
 </html>
