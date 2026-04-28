@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AxisCompany inc | Functional</title>
+    <title>AxisCompany inc | Auth System</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -15,7 +15,6 @@
             --accent: #10a37f;
         }
 
-        /* Темная тема (активируется классом) */
         body.dark-mode {
             --bg: #0b0d0e;
             --sidebar-bg: #000000;
@@ -31,8 +30,41 @@
             height: 100vh;
             background-color: var(--bg);
             color: var(--text);
-            transition: background 0.3s, color 0.3s;
+            transition: 0.3s;
             overflow: hidden;
+        }
+
+        /* Окно регистрации/входа */
+        #auth-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .auth-card {
+            background: var(--bg);
+            padding: 40px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--sidebar-bg);
+            color: var(--text);
+            box-sizing: border-box;
         }
 
         /* Сайдбар */
@@ -44,19 +76,13 @@
             flex-direction: column;
             padding: 24px;
             box-sizing: border-box;
-            flex-shrink: 0;
         }
-
-        .brand { font-weight: 700; font-size: 1.1rem; margin-bottom: 5px; }
-        .menu-label { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 40px; }
-        .tabs-header { font-weight: 700; font-size: 1.2rem; margin-bottom: 20px; }
 
         .nav-item {
             padding: 12px 0;
             cursor: pointer;
             font-size: 1rem;
             color: var(--text-secondary);
-            transition: 0.2s;
             border: none;
             background: none;
             text-align: left;
@@ -64,24 +90,13 @@
             font-family: inherit;
         }
 
-        .nav-item:hover { color: var(--text); }
         .nav-item.active { color: var(--text); font-weight: 700; }
 
-        /* Основная область */
-        main {
-            flex: 1;
-            padding: 60px;
-            overflow-y: auto;
-        }
-
+        /* Контент */
+        main { flex: 1; padding: 60px; overflow-y: auto; }
         .content-section { display: none; max-width: 700px; margin: 0 auto; }
         .content-section.active { display: block; animation: fadeIn 0.4s ease; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        h1 { font-size: 2.2rem; font-weight: 700; margin-bottom: 30px; }
-
-        /* Элементы функций */
         .card {
             background: var(--sidebar-bg);
             border: 1px solid var(--border);
@@ -94,137 +109,142 @@
             background: var(--text);
             color: var(--bg);
             border: none;
-            padding: 10px 20px;
+            padding: 12px 24px;
             border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
-            transition: 0.2s;
+            width: 100%;
         }
 
-        .btn:hover { opacity: 0.8; }
-
-        .news-date { font-size: 0.8rem; color: var(--accent); font-weight: 600; }
-
-        .ai-terminal {
-            background: #000;
-            color: #0f0;
-            font-family: monospace;
-            padding: 20px;
-            border-radius: 8px;
-            min-height: 100px;
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body id="body">
 
-    <aside class="sidebar">
-        <div class="brand">AxisCompany inc</div>
-        <div class="menu-label">Меню</div>
+    <!-- Слой регистрации -->
+    <div id="auth-overlay">
+        <div class="auth-card">
+            <h2 style="margin-top:0">Axis Auth</h2>
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">Введите данные для доступа к AxisCompany inc</p>
+            <input type="text" id="regName" class="auth-input" placeholder="Ваше имя">
+            <input type="email" id="regEmail" class="auth-input" placeholder="Email">
+            <button class="btn" onclick="handleAuth()" style="background: var(--accent); color: white;">Создать аккаунт</button>
+        </div>
+    </div>
 
-        <div class="tabs-header">вкладки</div>
+    <aside class="sidebar">
+        <div style="font-weight:700;">AxisCompany inc</div>
+        <div style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:40px;">Меню</div>
+
+        <div style="font-weight:700; font-size:1.2rem; margin-bottom:20px;">вкладки</div>
         <nav>
             <button class="nav-item active" onclick="openTab(event, 'home')">Главная</button>
             <button class="nav-item" onclick="openTab(event, 'settings')">Настройки</button>
             <button class="nav-item" onclick="openTab(event, 'account')">Аккаунт</button>
             <button class="nav-item" onclick="openTab(event, 'news')">Новости</button>
-            <button class="nav-item" onclick="openTab(event, 'axis-ai')">
-                AxisAI <span style="font-size: 0.7rem; color: #999;">(Dev)</span>
-            </button>
+            <button class="nav-item" onclick="openTab(event, 'axis-ai')">AxisAI</button>
         </nav>
     </aside>
 
     <main>
-        <!-- Главная -->
         <section id="home" class="content-section active">
-            <h1>Добро пожаловать</h1>
-            <p style="color: var(--text-secondary);">AxisCompany inc — это экосистема для ваших проектов. Используйте боковое меню для управления всеми функциями.</p>
+            <h1>Главная</h1>
             <div class="card">
-                <h3>Статус системы</h3>
-                <p>Все узлы работают штатно. Соединение защищено.</p>
+                <h3>Привет, <span id="welcomeName">пользователь</span>!</h3>
+                <p>Все системы Axis работают в штатном режиме.</p>
             </div>
         </section>
 
-        <!-- Настройки -->
         <section id="settings" class="content-section">
             <h1>Настройки</h1>
             <div class="card">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span>Темная тема</span>
-                    <button class="btn" onclick="toggleTheme()">Переключить</button>
+                    <span>Темный режим</span>
+                    <button class="btn" style="width: auto;" onclick="document.getElementById('body').classList.toggle('dark-mode')">Вкл/Выкл</button>
                 </div>
-            </div>
-            <div class="card">
-                <p>Язык интерфейса: <b>Русский</b></p>
-                <button class="btn" style="background: var(--border); color: var(--text);">Сменить язык</button>
             </div>
         </section>
 
-        <!-- Аккаунт -->
         <section id="account" class="content-section">
-            <h1>Ваш профиль</h1>
-            <div class="card" style="display: flex; align-items: center; gap: 20px;">
-                <div style="width: 60px; height: 60px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; font-weight: bold;">U</div>
-                <div>
-                    <h3 style="margin:0" id="userNameDisplay">User_Axis</h3>
-                    <p style="margin:0; font-size: 0.9rem; color: var(--text-secondary);">ID: 482910</p>
-                </div>
+            <h1>Мой Аккаунт</h1>
+            <div class="card">
+                <p><b>Имя:</b> <span id="profileName">---</span></p>
+                <p><b>Email:</b> <span id="profileEmail">---</span></p>
+                <p><b>Статус:</b> <span style="color: var(--accent);">Premium User</span></p>
             </div>
-            <button class="btn" style="width: 100%;" onclick="alert('Выход выполнен')">Выйти из системы</button>
+            <button class="btn" onclick="logout()" style="background: #ff4444; color: white;">Выйти из аккаунта</button>
         </section>
 
-        <!-- Новости -->
         <section id="news" class="content-section">
-            <h1>Последние новости</h1>
+            <h1>Новости</h1>
             <div class="card">
-                <span class="news-date">28 АПРЕЛЯ, 2026</span>
-                <h3>Запуск AxisCloud v11.5</h3>
-                <p>Мы обновили интерфейс и добавили функциональные вкладки для всех пользователей.</p>
-            </div>
-            <div class="card">
-                <span class="news-date">20 АПРЕЛЯ, 2026</span>
-                <h3>AxisAI переходит в фазу альфа-теста</h3>
-                <p>Нейронная сеть начинает обучаться на закрытых наборах данных.</p>
+                <small style="color: var(--accent);">28.04.2026</small>
+                <h3>Регистрация запущена</h3>
+                <p>Теперь каждый участник AxisCompany имеет свой уникальный профиль.</p>
             </div>
         </section>
 
-        <!-- AxisAI -->
         <section id="axis-ai" class="content-section">
-            <h1>Axis Intelligence</h1>
-            <div class="ai-terminal" id="terminal">
-                > Initializing AxisAI...<br>
-                > Loading neural modules...<br>
-                > Status: [Under development]<br>
-                > Access denied. Please wait for official release.
+            <h1>AxisAI</h1>
+            <div class="card" style="background: #000; color: #0f0; font-family: monospace;">
+                > Accessing database...<br>
+                > User identified: <span id="aiUser">---</span><br>
+                > Phase: Development
             </div>
-            <p style="margin-top: 20px; color: var(--text-secondary);">AxisAI — это следующий шаг в автоматизации вашего бизнеса. Релиз запланирован на конец 2026 года.</p>
         </section>
     </main>
 
     <script>
+        // Проверка: залогинен ли уже пользователь?
+        window.onload = () => {
+            const savedName = localStorage.getItem('axis_user');
+            if (savedName) {
+                applyUserData(savedName, localStorage.getItem('axis_email'));
+                document.getElementById('auth-overlay').style.display = 'none';
+            }
+        };
+
+        function handleAuth() {
+            const name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+
+            if (name && email) {
+                localStorage.setItem('axis_user', name);
+                localStorage.setItem('axis_email', email);
+                applyUserData(name, email);
+                
+                // Эффект закрытия окна
+                document.getElementById('auth-overlay').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('auth-overlay').style.display = 'none';
+                }, 300);
+            } else {
+                alert("Заполните все поля!");
+            }
+        }
+
+        function applyUserData(name, email) {
+            document.getElementById('welcomeName').innerText = name;
+            document.getElementById('profileName').innerText = name;
+            document.getElementById('profileEmail').innerText = email;
+            document.getElementById('aiUser').innerText = name;
+        }
+
+        function logout() {
+            localStorage.clear();
+            location.reload();
+        }
+
         function openTab(evt, tabName) {
             const sections = document.getElementsByClassName("content-section");
-            for (let i = 0; i < sections.length; i++) {
-                sections[i].classList.remove("active");
-            }
+            for (let i = 0; i < sections.length; i++) sections[i].classList.remove("active");
+            
             const navItems = document.getElementsByClassName("nav-item");
-            for (let i = 0; i < navItems.length; i++) {
-                navItems[i].classList.remove("active");
-            }
+            for (let i = 0; i < navItems.length; i++) navItems[i].classList.remove("active");
+            
             document.getElementById(tabName).classList.add("active");
             evt.currentTarget.classList.add("active");
         }
-
-        function toggleTheme() {
-            document.getElementById('body').classList.toggle('dark-mode');
-        }
-
-        // Эффект печати в терминале
-        let term = document.getElementById('terminal');
-        setInterval(() => {
-            term.innerHTML += ".";
-            if (term.innerHTML.length > 300) term.innerHTML = "> AxisAI is watching...";
-        }, 5000);
     </script>
-
 </body>
 </html>
