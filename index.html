@@ -3,95 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Axis Ecosystem | Platform</title>
+    <title>Axis AI | Vision Ecosystem</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        :root { --oa-green: #10a37f; --oa-bg: #0b0d0e; --sidebar: #000000; --card: #171717; --accent: #2d2d2d; }
+        :root { --oa-green: #10a37f; --oa-bg: #0b0d0e; --sidebar: #000000; --card: #171717; --glass: rgba(255, 255, 255, 0.05); }
+        * { box-sizing: border-box; transition: all 0.2s ease; }
         body { background: var(--oa-bg); color: #ececf1; font-family: 'Inter', sans-serif; margin: 0; display: flex; height: 100vh; overflow: hidden; }
         
-        /* Sidebar */
-        .sidebar { width: 260px; background: var(--sidebar); border-right: 1px solid var(--accent); display: flex; flex-direction: column; padding: 15px; }
-        .logo-box { font-weight: bold; color: var(--oa-green); margin-bottom: 30px; padding: 10px; font-size: 1.2rem; letter-spacing: 1px; }
-        .nav-item { padding: 12px; margin: 4px 0; border-radius: 10px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; font-size: 0.9rem; color: #acacbe; }
-        .nav-item:hover { background: #2d2d2d; color: white; }
-        .nav-item.active { background: #212121; border: 1px solid #444; color: white; }
+        /* Side Navigation */
+        .sidebar { width: 260px; background: var(--sidebar); border-right: 1px solid #2d2d2d; display: flex; flex-direction: column; padding: 20px; z-index: 100; }
+        .logo { font-weight: 600; color: var(--oa-green); margin-bottom: 40px; font-size: 1.3rem; letter-spacing: 1px; display: flex; align-items: center; }
+        .logo::before { content: ''; width: 12px; height: 12px; background: var(--oa-green); border-radius: 2px; margin-right: 10px; box-shadow: 0 0 10px var(--oa-green); }
+        
+        .nav-item { padding: 12px 15px; margin: 5px 0; border-radius: 10px; cursor: pointer; display: flex; align-items: center; font-size: 0.95rem; color: #acacbe; border: 1px solid transparent; }
+        .nav-item:hover { background: var(--glass); color: white; }
+        .nav-item.active { background: #212121; border-color: #444; color: white; }
+        .badge { background: #444; font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; margin-left: auto; }
 
-        /* Main Content */
-        main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; background: linear-gradient(180deg, #101214 0%, #0b0d0e 100%); }
-        .content-section { display: none; padding: 40px; width: 100%; max-width: 1100px; margin: 0 auto; animation: fadeIn 0.4s ease; }
-        .content-section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* Main Area */
+        main { flex: 1; overflow-y: auto; background: radial-gradient(circle at top right, #1a1a1a, #0b0d0e); }
+        .page { display: none; padding: 40px; width: 100%; max-width: 1200px; margin: 0 auto; animation: slideUp 0.4s ease; }
+        .page.active { display: block; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Grid & Cards */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-        .shorts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
-        .card { background: var(--card); border: 1px solid #333; border-radius: 12px; overflow: hidden; transition: 0.3s; position: relative; }
-        .card:hover { border-color: var(--oa-green); transform: translateY(-5px); }
-        .video-container { width: 100%; aspect-ratio: 16/9; background: #000; }
-        .short-container { width: 100%; aspect-ratio: 9/16; background: #000; }
-        iframe, video { width: 100%; height: 100%; border: none; }
+        /* Creator Studio & Inputs */
+        .studio-card { background: var(--glass); border: 1px solid #333; border-radius: 20px; padding: 30px; backdrop-filter: blur(10px); }
+        input, select { background: #000; border: 1px solid #444; color: white; width: 100%; padding: 14px; border-radius: 10px; margin-bottom: 15px; outline: none; font-size: 1rem; }
+        input:focus { border-color: var(--oa-green); }
+        .btn { background: var(--oa-green); color: white; border: none; padding: 12px 24px; border-radius: 10px; cursor: pointer; font-weight: 600; width: 100%; }
+        .btn:hover { filter: brightness(1.1); box-shadow: 0 0 20px rgba(16, 163, 127, 0.3); }
 
-        /* Input / Studio Area */
-        .studio-panel { background: rgba(255,255,255,0.03); border: 1px solid #333; border-radius: 15px; padding: 25px; margin-bottom: 30px; }
-        input, select { background: #000; border: 1px solid #444; color: white; width: 100%; padding: 12px; border-radius: 8px; margin-bottom: 15px; outline: none; }
-        .btn { background: var(--oa-green); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        /* Video Grids */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; }
+        .shorts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
+        
+        .video-card { background: var(--card); border-radius: 15px; overflow: hidden; border: 1px solid #2d2d2d; position: relative; }
+        .video-card:hover { border-color: var(--oa-green); transform: translateY(-5px); }
+        .thumb { width: 100%; aspect-ratio: 16/9; background: #000; }
+        .short-thumb { aspect-ratio: 9/16; }
+        iframe, video { width: 100%; height: 100%; border: none; display: block; }
+        .info { padding: 15px; }
+        .info b { display: block; margin-bottom: 5px; font-size: 1rem; }
+        .info small { color: #888; font-size: 0.8rem; }
 
-        /* Roadmap List */
-        .roadmap-item { border-left: 2px solid var(--oa-green); padding-left: 20px; margin-bottom: 20px; color: #888; }
-        .roadmap-item b { color: white; display: block; margin-bottom: 5px; }
+        /* Roadmap */
+        .roadmap { border-left: 1px solid #333; padding-left: 25px; margin-top: 30px; }
+        .step { position: relative; margin-bottom: 30px; }
+        .step::before { content: ''; position: absolute; left: -31px; top: 5px; width: 11px; height: 11px; background: #333; border-radius: 50%; }
+        .step.done::before { background: var(--oa-green); box-shadow: 0 0 10px var(--oa-green); }
+
+        /* Mobile View Fix */
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid #2d2d2d; padding: 10px; }
+            .logo { margin-bottom: 10px; }
+            .nav-item { font-size: 0.8rem; padding: 8px; }
+            .page { padding: 20px; }
+        }
     </style>
 </head>
 <body>
 
 <div class="sidebar">
-    <div class="logo-box">AXIS PROJECT</div>
-    <div class="nav-item active" onclick="showPage('tube-page', this)">📺 AxisTube</div>
-    <div class="nav-item" onclick="showPage('shorts-page', this)">📱 Shorts</div>
-    <div class="nav-item" onclick="showPage('ai-page', this)">🧠 AxisAI</div>
-    <div class="nav-item" onclick="showPage('studio-page', this)">🎨 Studio</div>
-    <div class="nav-item" onclick="showPage('acc-page', this)">⚙️ Account</div>
-    <div style="margin-top: auto; padding: 10px; font-size: 0.8rem; color: #888;" id="userTag">Offline</div>
+    <div class="logo">AXIS PROJECT</div>
+    <div class="nav-item active" onclick="switchPage('tube', this)">📺 AxisTube</div>
+    <div class="nav-item" onclick="switchPage('shorts', this)">📱 Shorts</div>
+    <div class="nav-item" onclick="switchPage('ai', this)">🧠 AxisAI <span class="badge">PRO</span></div>
+    <div class="nav-item" onclick="switchPage('studio', this)">🎨 Studio</div>
+    <div class="nav-item" onclick="switchPage('acc', this)">⚙️ Account</div>
+    
+    <div style="margin-top: auto; padding: 15px; background: var(--glass); border-radius: 12px; font-size: 0.85rem;" id="userNameTag">
+        Guest Mode
+    </div>
 </div>
 
 <main>
-    <section id="tube-page" class="content-section active">
-        <h2>AxisTube Feed</h2>
-        <div class="grid" id="videoFeed"></div>
+    <section id="page-tube" class="page active">
+        <h2>Recommended for you</h2>
+        <div class="grid" id="tubeFeed"></div>
     </section>
 
-    <section id="shorts-page" class="content-section">
-        <h2>Shorts Shelf</h2>
+    <section id="page-shorts" class="page">
+        <h2>Shorts Feed</h2>
         <div class="shorts-grid" id="shortsFeed"></div>
     </section>
 
-    <section id="ai-page" class="content-section">
-        <h1 style="color: var(--oa-green)">AxisAI Roadmap</h1>
-        <div class="roadmap-item"><b>v1.5 - Neural Search</b><p>Поиск видео по смыслу и содержанию через эмбеддинги.</p></div>
-        <div class="roadmap-item"><b>v2.0 - Vision Engine</b><p>Автоматическая генерация субтитров и описание контента.</p></div>
-        <div class="roadmap-item"><b>v3.0 - Axis Voice</b><p>Озвучка видео на 50+ языков в реальном времени.</p></div>
-    </section>
-
-    <section id="studio-page" class="content-section">
-        <h2>Творческая студия</h2>
-        <div class="studio-panel" id="uploadBox" style="display:none;">
-            <h3>Опубликовать новый контент</h3>
-            <input type="text" id="vTitle" placeholder="Заголовок...">
-            <input type="text" id="vUrl" placeholder="Ссылка (YouTube или MP4)...">
-            <select id="vType">
-                <option value="video">Обычное видео (16:9)</option>
-                <option value="short">Shorts (9:16)</option>
-            </select>
-            <button class="btn" id="postBtn">Опубликовать</button>
+    <section id="page-ai" class="page">
+        <h1 style="color: var(--oa-green)">AxisAI Roadmap 2026</h1>
+        <div class="roadmap">
+            <div class="step done"><b>v1.0 Vision Launch</b><p>Интеграция облака и стриминг контента.</p></div>
+            <div class="step"><b>v1.5 Neural Search</b><p>AI-поиск по видео через Gemini API.</p></div>
+            <div class="step"><b>v2.0 Axis Generative</b><p>Генерация Shorts из текста в один клик.</p></div>
         </div>
-        <p id="studioMsg">Войдите в аккаунт, чтобы загружать видео.</p>
     </section>
 
-    <section id="acc-page" class="content-section">
-        <h2>Настройки</h2>
-        <div id="authRequired"><button class="btn" onclick="login()">Login via Google</button></div>
-        <div id="accInfo" style="display:none;">
-            <p>ID: <span id="userName" style="color:var(--oa-green)"></span></p>
-            <div style="background:#000; padding:15px; border-radius:8px; font-family:monospace; border:1px solid #333;">
-                <small>PROJECT_SK:</small><br><span id="apiKey"></span>
+    <section id="page-studio" class="page">
+        <div class="studio-card">
+            <h3>Creator Studio</h3>
+            <div id="uploadForm" style="display:none;">
+                <input type="text" id="vTitle" placeholder="Как назовем контент?">
+                <input type="text" id="vUrl" placeholder="Ссылка (YouTube или прямой MP4)">
+                <select id="vType">
+                    <option value="tube">Обычное видео (16:9)</option>
+                    <option value="short">Shorts (9:16)</option>
+                </select>
+                <button class="btn" id="postBtn">Publish Content</button>
+            </div>
+            <p id="lockMsg">Чтобы публиковать видео, пожалуйста, войдите в аккаунт.</p>
+        </div>
+    </section>
+
+    <section id="page-acc" class="page">
+        <h2>Account Settings</h2>
+        <div id="authArea">
+            <button class="btn" onclick="login()">Sign in with Google</button>
+        </div>
+        <div id="userProfile" style="display:none;">
+            <p>Developer: <b id="profName"></b></p>
+            <div style="background:#000; padding:20px; border-radius:12px; border:1px solid #333; margin-top:20px;">
+                <small style="color:var(--oa-green)">MASTER_API_KEY:</small><br>
+                <code id="apiKey" style="word-break:break-all; font-size:0.9rem">axis_sk_...</code>
             </div>
         </div>
     </section>
@@ -100,8 +131,9 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { getDatabase, ref, push, onValue, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
+    // ТВOЙ КОНФИГ
     const firebaseConfig = {
         apiKey: "AIzaSyDw6J2bx2-K86qeP_fPVbpwE30iZIAU-Gk",
         authDomain: "axistube-31fee.firebaseapp.com",
@@ -116,47 +148,71 @@
     const db = getDatabase(app);
     const provider = new GoogleAuthProvider();
 
-    window.showPage = (id, el) => {
-        document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+    // Переключение страниц
+    window.switchPage = (pageId, el) => {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
+        document.getElementById('page-' + pageId).classList.add('active');
         el.classList.add('active');
     };
 
     window.login = () => signInWithPopup(auth, provider);
 
+    // Логика авторизации
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            document.getElementById('userTag').innerText = user.displayName;
-            document.getElementById('uploadBox').style.display = 'block';
-            document.getElementById('studioMsg').style.display = 'none';
-            document.getElementById('authRequired').style.display = 'none';
-            document.getElementById('accInfo').style.display = 'block';
-            document.getElementById('userName').innerText = user.displayName;
-            document.getElementById('apiKey').innerText = "axis_sk_" + btoa(user.uid).substring(0, 16);
+            document.getElementById('userNameTag').innerText = "Active: " + user.displayName;
+            document.getElementById('uploadForm').style.display = 'block';
+            document.getElementById('lockMsg').style.display = 'none';
+            document.getElementById('authArea').style.display = 'none';
+            document.getElementById('userProfile').style.display = 'block';
+            document.getElementById('profName').innerText = user.displayName;
+            document.getElementById('apiKey').innerText = "axis_live_sk_" + btoa(user.uid).substring(0, 20);
         }
     });
 
-    function getEmbed(url) {
-        if (url.includes('youtu.be')) return `https://www.youtube.com/embed/${url.split('/').pop().split('?')[0]}`;
-        if (url.includes('youtube.com')) return `https://www.youtube.com/embed/${new URLSearchParams(new URL(url).search).get('v')}`;
-        return null;
+    // Умный Embed (со звуком)
+    function createPlayer(url, type) {
+        let embed = "";
+        if (url.includes('youtu.be')) embed = `https://www.youtube.com/embed/${url.split('/').pop().split('?')[0]}`;
+        else if (url.includes('youtube.com')) embed = `https://www.youtube.com/embed/${new URLSearchParams(new URL(url).search).get('v')}`;
+
+        if (embed) return `<iframe src="${embed}" allowfullscreen allow="autoplay; encrypted-media"></iframe>`;
+        return `<video src="${url}" controls ${type === 'short' ? 'loop' : ''}></video>`;
     }
 
+    // Публикация
     document.getElementById('postBtn').onclick = () => {
-        const t = document.getElementById('vTitle').value, u = document.getElementById('vUrl').value, type = document.getElementById('vType').value;
-        if(t && u) push(ref(db, 'content'), { title: t, url: u, author: auth.currentUser.displayName, type: type });
+        const title = document.getElementById('vTitle').value;
+        const url = document.getElementById('vUrl').value;
+        const type = document.getElementById('vType').value;
+        if(title && url) {
+            push(ref(db, 'content'), {
+                title, url, type,
+                author: auth.currentUser.displayName,
+                time: serverTimestamp()
+            }).then(() => {
+                document.getElementById('vTitle').value = '';
+                document.getElementById('vUrl').value = '';
+                alert("Успешно опубликовано!");
+            });
+        }
     };
 
-    onValue(ref(db, 'content'), (s) => {
-        const tube = document.getElementById('videoFeed'), shorts = document.getElementById('shortsFeed');
+    // Рендеринг контента
+    onValue(ref(db, 'content'), (snap) => {
+        const tube = document.getElementById('tubeFeed'), shorts = document.getElementById('shortsFeed');
         tube.innerHTML = ''; shorts.innerHTML = '';
-        s.forEach(child => {
-            const v = child.val();
-            const embed = getEmbed(v.url);
-            const player = embed ? `<iframe src="${embed}" allowfullscreen></iframe>` : `<video src="${v.url}" controls></video>`;
-            const html = `<div class="card"><div class="${v.type === 'short' ? 'short-container' : 'video-container'}">${player}</div><div style="padding:12px"><b>${v.title}</b><br><small>${v.author}</small></div></div>`;
-            if(v.type === 'short') shorts.innerHTML += html; else tube.innerHTML += html;
+        snap.forEach(child => {
+            const data = child.val();
+            const player = createPlayer(data.url, data.type);
+            const html = `
+                <div class="video-card">
+                    <div class="thumb ${data.type === 'short' ? 'short-thumb' : ''}">${player}</div>
+                    <div class="info"><b>${data.title}</b><small>@${data.author}</small></div>
+                </div>`;
+            if (data.type === 'short') shorts.innerHTML += html;
+            else tube.innerHTML += html;
         });
     });
 </script>
